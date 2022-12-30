@@ -3,6 +3,7 @@
 
 # include <memory>
 # include "vector_iterator.hpp"
+namespace ft {
 
 template <
     typename T,
@@ -11,6 +12,12 @@ template <
 {
     
     public:
+
+        ////////////////////////////////////////////////////////////////////
+        //                         Member types                           //
+        ////////////////////////////////////////////////////////////////////
+
+        typedef     Allocator                               allocator_type;
         typedef     typename Allocator::value_type          value_type;
         typedef     typename Allocator::pointer             pointer;
         typedef     typename Allocator::const_pointer       const_pointer;
@@ -19,40 +26,76 @@ template <
         typedef     typename Allocator::size_type           size_type;
         typedef     typename Allocator::difference_type     difference_type;
 
-        typedef     typename VectorIterator<T>              Iterator;
+        /// Iterators
+        typedef     VectorIterator<value_type>              iterator;
+        typedef     const VectorIterator<value_type>        const_iterator;
 
-        vector(): _size(0), m_Data(NULL) {}
+        ////////////////////////////////////////////////////////////////////
+        //                         Constructors                           //
+        ////////////////////////////////////////////////////////////////////
+        vector(const allocator_type& alloc = allocator_type()): m_ReservedBlocks(0), m_Size(0), m_Data(NULL) {}
 
-        vector(size_type n, const value_type &val = value_type()): _size(n) {
-            m_Data = allocator.allocate(_size);
+        vector(size_type n, const value_type &val = value_type()): m_ReservedBlocks(n), m_Size(n)
+        {
+            m_Data = m_Allocator.allocate(m_Size);
             
-            for(int i = 0 ; i < _size; i++)
-                allocator.construct(m_Data + i, val);
+            for(int i = 0 ; i < m_Size; i++)
+                m_Allocator.construct(m_Data + i, val);
         }
 
-        vector(const vector &x): _size(x._size), allocator(x.allocator) {
-            m_Data = allocator.allocate(x._size);
+        // template <class InputIterator>
+        // vecotr (InputIterator first, InputIterator last)
+        // {
+        //     while (first != last)
+        //     {
+        //         // push back elements
+        //     }
+        // }
 
-            for(int i = 0; i < x._size; i++)
-                allocator.construct(m_Data + i, x.m_Data[i]);
-
-        }
-
-        Iterator& begin()
+        vector(const vector &other): m_ReservedBlocks(other.m_Size), m_Size(other.m_Size), m_Allocator(other.allocator)
         {
-            return (Iterator(m_Data));
+            m_Data = m_Allocator.allocate(other.m_Size);
+
+            for(int i = 0; i < other.m_Size; i++)
+                m_Allocator.construct(m_Data + i, other.m_Data[i]);
         }
 
-        Iterator& end()
+        ////////////////////////////////////////////////////////////////////
+        //                          Destructors                           //
+        ////////////////////////////////////////////////////////////////////
+
+
+        ////////////////////////////////////////////////////////////////////
+        //                        Iterators Methods                       //
+        ////////////////////////////////////////////////////////////////////
+        iterator begin()
         {
-            return (Iterator(m_Data + m_Size));
+            return (iterator(m_Data));
         }
 
+        iterator end()
+        {
+            return (iterator(m_Data + m_Size));
+        }
+
+        ////////////////////////////////////////////////////////////////////
+        //                          Vector Methods                        //
+        ////////////////////////////////////////////////////////////////////
+
+        void    push_back(const_reference other)
+        {
+            pointer ptr;
+
+            
+            ptr = m_Allocator.allocate(m_Size + 20);
+        }
 
     private:
+        size_type   m_ReservedBlocks;
         size_type   m_Size;
         pointer     m_Data;
         Allocator   m_Allocator;
 };
 
+}
 #endif
