@@ -1,13 +1,12 @@
-#include <memory>
-#include <iterator>
-#include <iostream>
-#include "vector.hpp"
+#include <unistd.h>
+#include <wait.h>
 
 int main()
 {
-    ft::vector<int> b(10, 20);
-
-    for(ft::vector<int>::iterator it = b.begin(); it != b.end(); it++){
-        std::cout << (*it) << std::endl;
+    int id = fork();
+    if (!id)
+    {
+        while (1);
     }
+    wait(NULL);
 }
