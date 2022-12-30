@@ -1,12 +1,18 @@
 #ifndef _VECTOR_ITERATOR_
 # define _VECTOR_ITERATOR_
 
-#include "vector.hpp"
+# include "vector.hpp"
+# include "vector_iterator_traits.hpp"
 template <class T>
 
 class VectorIterator
 {
     public:
+        typedef ft::iterator_traits<T>::value_type          value_type;
+        typedef ft::iterator_traits<T>::pointer             pointer;
+        typedef ft::iterator_traits<T>::reference           reference;
+        typedef const ft::iterator_traits<T>::reference     const_reference;
+
         typedef T                   value_type;
         typedef T*                  pointer;
         typedef T&                  reference;

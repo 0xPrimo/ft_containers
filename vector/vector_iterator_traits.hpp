@@ -1,0 +1,35 @@
+#ifndef __ITERATOR_TRAITS__
+# define __ITERATOR_TRAITS__
+
+# include <iterator>
+namespace ft{
+
+template <class T>
+struct iterator_traits{
+    typedef T                               value_type;
+    typedef T*                              pointer;
+    typedef T&                              reference;
+    typedef const std::ptrdiff_t            difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+};
+
+template <class T>
+struct iterator_traits<T*>{
+    typedef T                               value_type;
+    typedef T*                              pointer;
+    typedef T&                              reference;
+    typedef const std::ptrdiff_t            difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+};
+
+template <class T>
+struct iterator_traits<const T*>{
+    typedef const T                         value_type;
+    typedef const T*                        pointer;
+    typedef const T&                        reference;
+    typedef const std::ptrdiff_t            difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+};
+
+}
+#endif
