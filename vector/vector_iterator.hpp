@@ -73,7 +73,6 @@ namespace ft
 
             reference operator[](int index)
             {
-                std::cout << "true\n" << std::endl;
                 // if (index < 0){
                 //     // throw exception
                 // }
