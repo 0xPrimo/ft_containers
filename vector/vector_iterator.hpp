@@ -3,121 +3,128 @@
 
 # include "vector.hpp"
 # include "vector_iterator_traits.hpp"
-template <class T>
-
-class VectorIterator
+namespace ft
 {
-    public:
-        typedef ft::iterator_traits<T>::value_type          value_type;
-        typedef ft::iterator_traits<T>::pointer             pointer;
-        typedef ft::iterator_traits<T>::reference           reference;
-        typedef const ft::iterator_traits<T>::reference     const_reference;
+    template <
+                class Category,
+                class T,
+                class Distance = std::ptrdiff_t,
+                class Pointer = T*,
+                class Reference = T&            
+    > class Iterator
+    {
+        public:
 
-        typedef T                   value_type;
-        typedef T*                  pointer;
-        typedef T&                  reference;
-        typedef T const&            const_reference;
+            typedef T           value_type;
+            typedef Distance    difference_type;
+            typedef Pointer     pointer;
+            typedef Reference   reference;
+            typedef Category    category_type;
 
-    public:
-        VectorIterator(): m_Ptr(NULL) {};
-        VectorIterator(pointer ptr): m_Ptr(ptr){}
-        
-        VectorIterator& operator=(const VectorIterator& other)
-        {
-            other.m_Ptr = m_Ptr;
-            return (*this);
-        }
-
-        VectorIterator& operator++(int)
-        {
-            m_Ptr++;
-            return(*this);
-        }
-
-        VectorIterator operator++()
-        {
-            VectorIterator tmp = *this;
-            m_Ptr++;
-            return (tmp);
-        }       
-        
-        
-        VectorIterator& operator--(int)
-        {
-            m_Ptr--;
-            return (*this);
-        }
-
-        VectorIterator operator--()
-        {
-            VectorIterator tmp = *this;
-            m_Ptr--;
-            return (tmp);
-        }
-
-        pointer operator->()
-        {
-            return (m_Ptr);
-        }
-
-        reference operator*()
-        {
-            return (*m_Ptr);
-        }
-
-        reference operator[](int index)
-        {
-            if (index < 0){
-                // throw exception
+        public:
+            
+            Iterator(pointer Ptr)
+            {
+                m_Ptr = Ptr;
             }
-            return (*(m_Ptr + index));
-        }
 
-        bool operator!=(const VectorIterator& other)
-        {
-            if (other.m_Ptr != m_Ptr)
-                return (true);
-            return (false);
-        }
+            Iterator& operator=(const Iterator& other)
+            {
+                other.m_Ptr = m_Ptr;
+                return (*this);
+            }
 
-        bool operator==(const VectorIterator& other)
-        {
-            if (other.m_Ptr == m_Ptr)
-                return (true);
-            return (false);
-        }
-        
-        bool operator>(const VectorIterator& other)
-        {
-            if (other.m_Ptr > m_Ptr)
-                return (true);
-            return (false);
-        }
+            Iterator& operator++()
+            {
+                m_Ptr++;
+                return(*this);
+            }
 
-        bool operator>=(const VectorIterator& other)
-        {
-            if (other.m_Ptr >= m_Ptr)
-                return (true);
-            return (false);
-        }
+            Iterator operator++(int)
+            {
+                Iterator tmp = *this;
+                m_Ptr++;
+                return (tmp);
+            }       
+            
+            
+            Iterator& operator--(int)
+            {
+                m_Ptr--;
+                return (*this);
+            }
 
-        bool operator<(const VectorIterator& other)
-        {
-            if (other.m_Ptr < m_Ptr)
-                return (true);
-            return (false);
-        }
+            Iterator operator--()
+            {
+                Iterator tmp = *this;
+                m_Ptr--;
+                return (tmp);
+            }
 
-        bool operator<=(const VectorIterator& other)
-        {
-            if (other.m_Ptr <= m_Ptr)
-                return (true);
-            return (false);
-        }
+            pointer operator->()
+            {
+                return (m_Ptr);
+            }
 
-    private:
-        pointer     m_Ptr;
+            reference operator*()
+            {
+                return (*m_Ptr);
+            }
 
-};
+            reference operator[](int index)
+            {
+                std::cout << "true\n" << std::endl;
+                // if (index < 0){
+                //     // throw exception
+                // }
+                return (*(m_Ptr + index));
+            }
 
+            bool operator!=(const Iterator& other)
+            {
+                if (other.m_Ptr != m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+            bool operator==(const Iterator& other)
+            {
+                if (other.m_Ptr == m_Ptr)
+                    return (true);
+                return (false);
+            }
+            
+            bool operator>(const Iterator& other)
+            {
+                if (other.m_Ptr > m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+            bool operator>=(const Iterator& other)
+            {
+                if (other.m_Ptr >= m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+            bool operator<(const Iterator& other)
+            {
+                if (other.m_Ptr < m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+            bool operator<=(const Iterator& other)
+            {
+                if (other.m_Ptr <= m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+        private:
+            pointer     m_Ptr;
+
+    };
+}
 #endif

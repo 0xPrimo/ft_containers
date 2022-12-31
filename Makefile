@@ -5,8 +5,13 @@ src = main.cpp
 
 NAME = bin
 
-all:$(NAME)
+all: $(NAME)
+
+$(NAME):$(src)
 	$(CC) $(src) -o $(NAME)
 
 debug:
-	$(CC) $(src) $(DFLAGS)	
+	$(CC) $(src) $(DFLAGS)
+
+clean:
+	rm -rf $(NAME)

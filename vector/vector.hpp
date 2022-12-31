@@ -3,12 +3,15 @@
 
 # include <memory>
 # include "vector_iterator.hpp"
+
 namespace ft {
 
 template <
-    typename T,
-    typename Allocator = std::allocator<T>
-> class vector
+            class T,
+            class Allocator = std::allocator<T>
+>
+
+class vector
 {
     
     public:
@@ -27,8 +30,7 @@ template <
         typedef     typename Allocator::difference_type     difference_type;
 
         /// Iterators
-        typedef     VectorIterator<value_type>              iterator;
-        typedef     const VectorIterator<value_type>        const_iterator;
+        typedef     ft::Iterator<std::random_access_iterator_tag, T>                            iterator;
 
         ////////////////////////////////////////////////////////////////////
         //                         Constructors                           //
