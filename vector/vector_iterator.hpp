@@ -1,36 +1,37 @@
 #ifndef _VECTOR_ITERATOR_
 # define _VECTOR_ITERATOR_
 
-# include "vector.hpp"
 # include "vector_iterator_traits.hpp"
 namespace ft
 {
-    template <
-                class Category,
-                class T,
-                class Distance = std::ptrdiff_t,
-                class Pointer = T*,
-                class Reference = T&            
-    > class Iterator
+    template <class T> class Iterator
     {
         public:
 
-            typedef T           value_type;
-            typedef Distance    difference_type;
-            typedef Pointer     pointer;
-            typedef Reference   reference;
-            typedef Category    category_type;
+            typedef typename ft::iterator_traits<T>::value_type                  value_type;
+            typedef typename ft::iterator_traits<T>::difference_type             difference_type;
+            typedef typename ft::iterator_traits<T>::pointer                     pointer;
+            typedef typename ft::iterator_traits<T>::reference                   reference;
+            typedef typename ft::iterator_traits<T>::iterator_category           iterator_category;
 
         public:
             
-            Iterator(pointer Ptr)
+            Iterator(pointer Ptr = nullptr)
             {
                 m_Ptr = Ptr;
             }
 
+            template <class type>
+            Iterator(const Iterator<type> &other): m_Ptr(other.base()) {}
+
+            T base() const
+            {
+                return (m_Ptr);
+            }
+
             Iterator& operator=(const Iterator& other)
             {
-                other.m_Ptr = m_Ptr;
+                m_Ptr = other.base();
                 return (*this);
             }
 
@@ -45,33 +46,32 @@ namespace ft
                 Iterator tmp = *this;
                 m_Ptr++;
                 return (tmp);
-            }       
-            
-            
-            Iterator& operator--(int)
+            }
+
+            Iterator operator--(int)
             {
                 m_Ptr--;
                 return (*this);
             }
 
-            Iterator operator--()
+            Iterator& operator--()
             {
                 Iterator tmp = *this;
                 m_Ptr--;
                 return (tmp);
             }
 
-            pointer operator->()
+            pointer operator->() const
             {
                 return (m_Ptr);
             }
 
-            reference operator*()
+            reference operator*() const
             {
                 return (*m_Ptr);
             }
 
-            reference operator[](int index)
+            reference operator[](int index) const
             {
                 // if (index < 0){
                 //     // throw exception
@@ -79,46 +79,72 @@ namespace ft
                 return (*(m_Ptr + index));
             }
 
-            bool operator!=(const Iterator& other)
+            template <class cmp_type>
+            bool operator!=(const Iterator<cmp_type>& other) const
             {
-                if (other.m_Ptr != m_Ptr)
+                if (other.base() != m_Ptr)
                     return (true);
                 return (false);
             }
 
-            bool operator==(const Iterator& other)
+            template <class cmp_type>
+            bool operator==(const Iterator<cmp_type>& other) const
             {
-                if (other.m_Ptr == m_Ptr)
-                    return (true);
-                return (false);
-            }
-            
-            bool operator>(const Iterator& other)
-            {
-                if (other.m_Ptr > m_Ptr)
+                if (other.base() == m_Ptr)
                     return (true);
                 return (false);
             }
 
-            bool operator>=(const Iterator& other)
+            template <class cmp_type>            
+            bool operator>(const Iterator<cmp_type>& other) const
             {
-                if (other.m_Ptr >= m_Ptr)
+                if (other.base() > m_Ptr)
                     return (true);
                 return (false);
             }
 
-            bool operator<(const Iterator& other)
+            template <class cmp_type>
+            bool operator>=(const Iterator<cmp_type>& other) const
             {
-                if (other.m_Ptr < m_Ptr)
+                if (other.base() >= m_Ptr)
                     return (true);
                 return (false);
             }
 
-            bool operator<=(const Iterator& other)
+            template <class cmp_type>
+            bool operator<(const Iterator<cmp_type>& other) const
             {
-                if (other.m_Ptr <= m_Ptr)
+                if (other.base() < m_Ptr)
                     return (true);
                 return (false);
+            }
+
+            template <class cmp_type>
+            bool operator<=(const Iterator<cmp_type>& other) const
+            {
+                if (other.base() <= m_Ptr)
+                    return (true);
+                return (false);
+            }
+
+            Iterator operator+(difference_type n) const
+            {
+                return (Iterator(m_Ptr + n));
+            }
+
+            Iterator operator-(difference_type n) const
+            {
+                return (Iterator(m_Ptr - n));
+            }
+
+            Iterator operator+=(difference_type n) const
+            {
+                return (Iterator(m_Ptr + n));
+            }
+
+            Iterator operator-=(difference_type n) const
+            {
+                return (Iterator(m_Ptr - n));
             }
 
         private:

@@ -3,6 +3,7 @@
 
 # include <memory>
 # include "vector_iterator.hpp"
+# include "vector_reverse_iterator.hpp"
 
 namespace ft {
 
@@ -20,41 +21,56 @@ class vector
         //                         Member types                           //
         ////////////////////////////////////////////////////////////////////
 
-        typedef     Allocator                               allocator_type;
-        typedef     typename Allocator::value_type          value_type;
-        typedef     typename Allocator::pointer             pointer;
-        typedef     typename Allocator::const_pointer       const_pointer;
-        typedef     typename Allocator::reference           reference;
-        typedef     typename Allocator::const_reference     const_reference;
-        typedef     typename Allocator::size_type           size_type;
-        typedef     typename Allocator::difference_type     difference_type;
+        typedef     Allocator                                   allocator_type;
+        typedef     typename Allocator::value_type              value_type;
+        typedef     typename Allocator::pointer                 pointer;
+        typedef     typename Allocator::const_pointer           const_pointer;
+        typedef     typename Allocator::reference               reference;
+        typedef     typename Allocator::const_reference         const_reference;
+        typedef     typename Allocator::size_type               size_type;
+        typedef     typename Allocator::difference_type         difference_type;
 
-        /// Iterators
-        typedef     ft::Iterator<std::random_access_iterator_tag, T>                            iterator;
+
+        typedef     ft::Iterator<T*>                            iterator;
+        typedef     ft::Iterator<const T*>                      const_iterator;
+        typedef     ft::reverse_iterator<T*>                    reverse_iterator;
+        typedef     ft::reverse_iterator<const T*>              const_reverse_iterator;
 
         ////////////////////////////////////////////////////////////////////
-        //                         Constructors                           //
+        //                        Member functions                        //
         ////////////////////////////////////////////////////////////////////
-        vector(const allocator_type& alloc = allocator_type()): m_ReservedBlocks(0), m_Size(0), m_Data(NULL) {}
+        /* Default constructor */
+        vector(const allocator_type& alloc = allocator_type()):     m_Size(0),
+                                                                    m_Capacity(0),
+                                                                    m_Data(nullptr)
+        {
 
-        vector(size_type n, const value_type &val = value_type()): m_ReservedBlocks(n), m_Size(n)
+        }
+
+        /* Size constructor */
+        vector(size_type n, const value_type &val = value_type()):  m_Size(n),
+                                                                    m_Capacity(n)
         {
             m_Data = m_Allocator.allocate(m_Size);
-            
-            for(int i = 0 ; i < m_Size; i++)
+
+            for(int i = 0 ; i < n; i++)
                 m_Allocator.construct(m_Data + i, val);
         }
 
+        /* Iterator constructor */
         // template <class InputIterator>
-        // vecotr (InputIterator first, InputIterator last)
+        // vector (InputIterator first, InputIterator last)
         // {
         //     while (first != last)
         //     {
         //         // push back elements
         //     }
-        // }
+        // } 
 
-        vector(const vector &other): m_ReservedBlocks(other.m_Size), m_Size(other.m_Size), m_Allocator(other.allocator)
+        /* Copy Constructor */
+        vector(const vector &other):    m_Size(other.m_Size),
+                                        m_Capacity(other.m_Capacity),
+                                        m_Allocator(other.allocator)
         {
             m_Data = m_Allocator.allocate(other.m_Size);
 
@@ -62,39 +78,124 @@ class vector
                 m_Allocator.construct(m_Data + i, other.m_Data[i]);
         }
 
-        ////////////////////////////////////////////////////////////////////
-        //                          Destructors                           //
-        ////////////////////////////////////////////////////////////////////
+        /* Destructor */
+        ~vector()
+        {
 
+        }
+
+        /* Assigns values to the container */
+        vector& operator=(const vector &other)
+        {
+            this->m_Ptr = other.Ptr;
+        }
+
+        /* Assigns values to the container */
+        void    assign(size_type count, const T& value)
+        {
+            if (count > m_Capacity)
+                reserve(count);
+            m_Size = count;
+            for(int i = 0; i < count; i++)
+                m_Data[i] = value;
+        }
+
+
+        /* Returns the allocator associated with the container */
+        allocator_type get_allocator() const
+        {
+            return (m_Allocator);
+        }
 
         ////////////////////////////////////////////////////////////////////
         //                        Iterators Methods                       //
         ////////////////////////////////////////////////////////////////////
+        /**/
+
+        ////////////////////////////////////////////////////////////////////
+        //                          Element access                        //
+        ////////////////////////////////////////////////////////////////////
+        /**/
+
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Iterators                           //
+        ////////////////////////////////////////////////////////////////////
+
+        /* Return iterator pointing to the first element */
         iterator begin()
         {
             return (iterator(m_Data));
         }
 
+        /* Return iterator pointing to the last elemnt */
         iterator end()
         {
             return (iterator(m_Data + m_Size));
         }
 
         ////////////////////////////////////////////////////////////////////
-        //                          Vector Methods                        //
+        //                            Capacity                            //
         ////////////////////////////////////////////////////////////////////
-
-        void    push_back(const_reference other)
+        /* Checks whether the container is empty */
+        bool empty() const
         {
-            pointer ptr;
-
-            
-            ptr = m_Allocator.allocate(m_Size + 20);
+            if (m_Size == 0)
+                return (true);
+            else
+                return (false);
+        }
+        /* Returns the number of elements */
+        size_type size() const
+        {
+            return (m_Size);
         }
 
+        /* Returns the maximum possible number of elements */
+        size_type max_size() const
+        {
+            return (m_Allocator.max_size());
+        }
+
+        /* Increase the capacity of the container */
+        void reserve(size_type new_cap)
+        {
+            std::cout << "somthing " << m_Size << std::endl;
+            if (new_cap > m_Allocator.max_size())
+                throw std::length_error("vector");
+            if (new_cap > m_Capacity)
+            {
+                pointer ptr = m_Data;
+                m_Data = m_Allocator.allocate(new_cap);
+                for(int i = 0; i < m_Size; i++)
+                    m_Allocator.construct(m_Data + i, ptr[i]);
+                for(int i = 0; i < m_Size; i++)
+                    m_Allocator.destroy(ptr + i);
+                m_Allocator.deallocate(ptr, m_Size);
+                m_Capacity = new_cap;
+            }
+        }
+
+        /* The capacity of the currently allocated storage */
+        size_type capacity() const
+        {
+            return (m_Capacity);
+        }
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Modifiers                           //
+        ////////////////////////////////////////////////////////////////////
+        /**/
+
+        ////////////////////////////////////////////////////////////////////
+        //                        Non-member functions                    //
+        ////////////////////////////////////////////////////////////////////
+        /**/
+
+
     private:
-        size_type   m_ReservedBlocks;
         size_type   m_Size;
+        size_type   m_Capacity;
         pointer     m_Data;
         Allocator   m_Allocator;
 };

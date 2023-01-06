@@ -2,16 +2,20 @@
 #include <iterator>
 #include <vector>
 #include <list>
-// #include "vector/vector_iterator_traits.hpp"
-// #include "vector/vector_iterator.hpp"
+#include <memory>
+
 #include "vector/vector.hpp"
 
 int main()
 {
-    ft::vector<int> vec(10, 5);
+    int a = 10;
+    ft::vector<char> vec(10, 'b');
 
-    ft::vector<int>::iterator it = vec.begin();
 
-    for(int i = 0 ;i < 10; i++)
-        std::cout << it.operator[](i) << std::endl;
+
+    vec.assign(200, 'a');
+    for(ft::vector<char>::iterator it = vec.begin(); it != vec.end(); it++){
+        std::cout << *it << std::endl;
+    }
+    std::cout << vec.capacity() << std::endl;
 }
