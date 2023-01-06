@@ -1,5 +1,5 @@
-#ifndef _VECTOR_
-# define _VECTOR_
+#ifndef VECTOR_HPP
+# define VECTOR_HPP
 
 # include <memory>
 # include "vector_iterator.hpp"
@@ -108,16 +108,68 @@ class vector
         }
 
         ////////////////////////////////////////////////////////////////////
-        //                        Iterators Methods                       //
-        ////////////////////////////////////////////////////////////////////
-        /**/
-
-        ////////////////////////////////////////////////////////////////////
         //                          Element access                        //
         ////////////////////////////////////////////////////////////////////
-        /**/
+        /* Access specified element */
+        reference at(size_type pos)
+        {
+            if (pos >= m_Size)
+                std::out_of_range("vector");
+            return (*(m_Data + pos));
+        }
 
+        const_reference at(size_type pos) const
+        {
+            if (pos >= m_Size)
+                std::out_of_range("vector");
+            return (*(m_Data + pos));
+        }
 
+        reference operator[](size_type pos)
+        {
+            if (pos >= m_Size)
+                std::out_of_range("vector");
+            return (*(m_Data + pos));
+        }
+
+        const_reference operator[](size_type pos) const
+        {
+            if (pos >= m_Size)
+                std::out_of_range("vector");
+            return (*(m_Data + pos));
+        }
+
+        /* Access the first element */
+        reference front()
+        {
+            return (*m_Data);
+        }
+
+        const_reference front() const
+        {
+            return (*m_Data);
+        }
+
+        /* Access the last element */
+        reference back()
+        {
+            return (*(m_Data + m_Size));
+        }
+
+        reference back() const
+        {
+            return (*(m_Data + m_Size));
+        }
+        
+        pointer data()
+        {
+            return (m_Data);
+        }
+
+        const_pointer data() const
+        {
+            return (m_Data);
+        }
         ////////////////////////////////////////////////////////////////////
         //                            Iterators                           //
         ////////////////////////////////////////////////////////////////////
