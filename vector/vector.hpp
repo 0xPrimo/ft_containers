@@ -31,10 +31,10 @@ class vector
         typedef     typename Allocator::difference_type         difference_type;
 
 
-        typedef     ft::Iterator<T*>                            iterator;
-        typedef     ft::Iterator<const T*>                      const_iterator;
-        typedef     ft::reverse_iterator<T*>                    reverse_iterator;
-        typedef     ft::reverse_iterator<const T*>              const_reverse_iterator;
+        typedef     ft::Iterator<pointer>                       iterator;
+        typedef     ft::Iterator<const_pointer>                 const_iterator;
+        typedef     ft::reverse_iterator<iterator>              reverse_iterator;
+        typedef     ft::reverse_iterator<const_iterator>        const_reverse_iterator;
 
         ////////////////////////////////////////////////////////////////////
         //                        Member functions                        //
@@ -180,12 +180,42 @@ class vector
             return (iterator(m_Data));
         }
 
+        const_iterator begin() const
+        {
+            return (const_iterator(m_Data));
+        }
+
         /* Return iterator pointing to the last elemnt */
         iterator end()
         {
             return (iterator(m_Data + m_Size));
         }
 
+        const_iterator end() const
+        {
+            return (const_iterator(m_Data + m_Size));
+        }
+        
+        /* Reverse iterator */
+        reverse_iterator rbegin()
+        {
+            return(reverse_iterator(iterator()));
+        }
+
+        // const_reverse_iterator rbegin() const
+        // {
+        //     return (const_reverse_iterator(iterator(m_Data + m_Size)));
+        // }
+
+        // reverse_iterator rend()
+        // {
+        //     return (reverse_iterator(iterator(m_Data)));
+        // }
+
+        // const_reverse_iterator rend() const
+        // {
+        //     return (const_reverse_iterator(iterator(m_Data)));
+        // }
         ////////////////////////////////////////////////////////////////////
         //                            Capacity                            //
         ////////////////////////////////////////////////////////////////////

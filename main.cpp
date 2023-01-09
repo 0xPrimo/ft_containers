@@ -9,13 +9,12 @@
 int main()
 {
     int a = 10;
-    ft::vector<char> vec(10, 'b');
 
+    ft::vector<int> vec(10, 2);
 
+    // ft::vector<int>::reverse_iterator it = vec.rbegin();
+    vec.rbegin();
 
-    vec.assign(200, 'a');
-    for(ft::vector<char>::iterator it = vec.begin(); it != vec.end(); it++){
-        std::cout << *it << std::endl;
-    }
-    std::cout << vec.capacity() << std::endl;
+    // std::cout << *it << std::endl;
+    
 }
