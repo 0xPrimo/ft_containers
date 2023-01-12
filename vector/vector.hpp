@@ -199,23 +199,23 @@ class vector
         /* Reverse iterator */
         reverse_iterator rbegin()
         {
-            return(reverse_iterator(iterator()));
+            return(reverse_iterator(iterator(m_Data + m_Size)));
         }
 
-        // const_reverse_iterator rbegin() const
-        // {
-        //     return (const_reverse_iterator(iterator(m_Data + m_Size)));
-        // }
+        const_reverse_iterator rbegin() const
+        {
+            return (const_reverse_iterator(iterator(m_Data + m_Size)));
+        }
 
-        // reverse_iterator rend()
-        // {
-        //     return (reverse_iterator(iterator(m_Data)));
-        // }
+        reverse_iterator rend()
+        {
+            return (reverse_iterator(iterator(m_Data)));
+        }
 
-        // const_reverse_iterator rend() const
-        // {
-        //     return (const_reverse_iterator(iterator(m_Data)));
-        // }
+        const_reverse_iterator rend() const
+        {
+            return (const_reverse_iterator(iterator(m_Data)));
+        }
         ////////////////////////////////////////////////////////////////////
         //                            Capacity                            //
         ////////////////////////////////////////////////////////////////////
@@ -267,13 +267,31 @@ class vector
         ////////////////////////////////////////////////////////////////////
         //                            Modifiers                           //
         ////////////////////////////////////////////////////////////////////
-        /**/
+        /* destroy all the elements of the container */
+        void clear()
+        {
+            for(int i = 0; i < m_Size; i++){
+                m_Allocator.destroy(m_Data[i]);
+            }
+            m_Size = 0;
+        }
 
-        ////////////////////////////////////////////////////////////////////
-        //                        Non-member functions                    //
-        ////////////////////////////////////////////////////////////////////
-        /**/
+        /* insert an element to the container */
+        iteraotr insert(const_iterator pos, const T& value)
+        {
 
+        }
+
+        iterator insert(const_iterator pos, size_type count, const T& value)
+        {
+
+        }
+
+        template< class InputIt>
+        iterator insert(const_iteartor pos, InputIt first, InputIt last)
+        {
+            
+        }
 
     private:
         size_type   m_Size;
@@ -281,6 +299,11 @@ class vector
         pointer     m_Data;
         Allocator   m_Allocator;
 };
+
+        ////////////////////////////////////////////////////////////////////
+        //                        Non-member functions                    //
+        ////////////////////////////////////////////////////////////////////
+        /**/
 
 }
 #endif

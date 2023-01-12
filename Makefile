@@ -8,6 +8,7 @@ NAME = bin
 all: $(NAME)
 
 $(NAME):$(src)
+	@rm -rf bin
 	$(CC) $(src) -o $(NAME)
 
 debug:

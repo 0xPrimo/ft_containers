@@ -48,13 +48,13 @@ namespace ft
                 return (tmp);
             }
 
-            Iterator operator--(int)
+            Iterator& operator--()
             {
                 m_Ptr--;
                 return (*this);
             }
 
-            Iterator& operator--()
+            Iterator operator--(int)
             {
                 Iterator tmp = *this;
                 m_Ptr--;
@@ -77,54 +77,6 @@ namespace ft
                 //     // throw exception
                 // }
                 return (*(m_Ptr + index));
-            }
-
-            template <class cmp_type>
-            bool operator!=(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() != m_Ptr)
-                    return (true);
-                return (false);
-            }
-
-            template <class cmp_type>
-            bool operator==(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() == m_Ptr)
-                    return (true);
-                return (false);
-            }
-
-            template <class cmp_type>            
-            bool operator>(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() > m_Ptr)
-                    return (true);
-                return (false);
-            }
-
-            template <class cmp_type>
-            bool operator>=(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() >= m_Ptr)
-                    return (true);
-                return (false);
-            }
-
-            template <class cmp_type>
-            bool operator<(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() < m_Ptr)
-                    return (true);
-                return (false);
-            }
-
-            template <class cmp_type>
-            bool operator<=(const Iterator<cmp_type>& other) const
-            {
-                if (other.base() <= m_Ptr)
-                    return (true);
-                return (false);
             }
 
             Iterator operator+(difference_type n) const
@@ -152,4 +104,52 @@ namespace ft
 
     };
 }
+    template <class it1, class it2>
+    bool operator==(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() == iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator!=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() != iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator<(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() < iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator<=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() <= iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator>(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() > iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator>=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    {
+        if (iter1.base() >= iter2.base())
+            return (true);
+        return (false);
+    }
+
 #endif
