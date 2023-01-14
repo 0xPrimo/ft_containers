@@ -4,23 +4,16 @@
 #include <list>
 #include <memory>
 
-// #include "vector/vector.hpp"
+#include "vector/vector.hpp"
 
 int main()
 {
-    std::vector<int> vec(10, 20);
+    std::vector<int> vec;
 
-    std::vector<int>::iterator itr = vec.begin();
-    // vec.insert(itr, 100);
-    // itr = vec.begin() + 1;
-    // vec.insert(itr, 100);
-    // itr = vec.end();
-    // vec.insert(itr, 100);
-
+    vec.insert(vec.begin(), 911);
+    vec.insert(vec.begin() + 10, 911);
     std::vector<int>::iterator it = vec.begin();
-
-    for(;it != vec.end(); it++){
+    for(; it != vec.end(); it++)
         std::cout << *it << std::endl;
-    }
-    std::cout << "Capacity: " << vec.capacity() << std::endl;
+    std::cout << vec.size() << ", " << vec.capacity() << std::endl;
 }

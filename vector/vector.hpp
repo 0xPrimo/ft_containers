@@ -2,6 +2,7 @@
 # define VECTOR_HPP
 
 # include <memory>
+# include <cstring>
 # include "vector_iterator.hpp"
 # include "vector_reverse_iterator.hpp"
 
@@ -242,7 +243,6 @@ class vector
         /* Increase the capacity of the container */
         void reserve(size_type new_cap)
         {
-            std::cout << "somthing " << m_Size << std::endl;
             if (new_cap > m_Allocator.max_size())
                 throw std::length_error("vector");
             if (new_cap > m_Capacity)
@@ -276,10 +276,27 @@ class vector
             m_Size = 0;
         }
 
-        /* insert an element to the container */
-        iteraotr insert(const_iterator pos, const T& value)
+        /* insert */
+        iterator insert(const_iterator pos, const T& value)
         {
-
+            size_type   index = &(*pos) - &(*begin());
+            
+            if (!m_Size)
+                reserve(1);
+            if (m_Size == m_Capacity)
+                reserve(m_Capacity * 2);
+            if (index > m_Size && m_Capacity > m_Size)
+                m_Size += index;
+            else
+                m_Size++;
+            // Shift array
+            for(int i = m_Size; i > index; i--)
+            {
+                m_Allocator.destroy(m_Data + i);
+                m_Allocator.construct(m_Data + i, m_Data[i - 1]);
+            }
+            m_Allocator.construct(m_Data + index, value);
+            return (iterator(m_Data + index));
         }
 
         iterator insert(const_iterator pos, size_type count, const T& value)
@@ -288,9 +305,20 @@ class vector
         }
 
         template< class InputIt>
-        iterator insert(const_iteartor pos, InputIt first, InputIt last)
+        iterator insert(const_iterator pos, InputIt first, InputIt last)
         {
             
+        }
+
+        /* push back */
+        void push_back(const T& value)
+        {
+            if (!m_Size)
+                reserve(1);
+            if (m_Size == m_Capacity)
+                reserve(m_Capacity * 2);
+            m_Allocator.construct(m_Data + m_Size, value);
+            m_Size++;
         }
 
     private:
