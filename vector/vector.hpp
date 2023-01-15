@@ -279,36 +279,32 @@ class vector
         /* insert */
         iterator insert(const_iterator pos, const T& value)
         {
-            size_type   index = &(*pos) - &(*begin());
-            
-            if (!m_Size)
-                reserve(1);
-            if (m_Size == m_Capacity)
-                reserve(m_Capacity * 2);
-            if (index > m_Size && m_Capacity > m_Size)
-                m_Size += index;
-            else
-                m_Size++;
-            // Shift array
-            for(int i = m_Size; i > index; i--)
-            {
-                m_Allocator.destroy(m_Data + i);
-                m_Allocator.construct(m_Data + i, m_Data[i - 1]);
-            }
-            m_Allocator.construct(m_Data + index, value);
+            size_type   index = &(*pos) - m_Data;
+            insert(pos, 1, value);
             return (iterator(m_Data + index));
         }
 
         iterator insert(const_iterator pos, size_type count, const T& value)
         {
+            size_type index = &(*pos) - m_Data;
 
-        }
-
-        template< class InputIt>
-        iterator insert(const_iterator pos, InputIt first, InputIt last)
-        {
+            if (m_Size + count >= m_Capacity)
+                reserve(m_Size + count);
             
+            // shift the array by the count
+            for(int i = m_Size + count; i > index; i--)
+            {
+                m_Allocator.construct(m_Data + i, m_Data[i - count]);  
+                m_Allocator.destroy(m_Data + i - count);
+            }
+            return (iterator(m_Data + index));
         }
+
+        // template< class InputIt>
+        // iterator insert(const_iterator pos, InputIt first, InputIt last)
+        // {
+
+        // }
 
         /* push back */
         void push_back(const T& value)
