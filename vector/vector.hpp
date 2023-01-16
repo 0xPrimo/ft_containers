@@ -361,13 +361,38 @@ class vector
             m_Allocator.construct(m_Data + m_Size, value);
             m_Size++;
         }
+    
+        /* resize */
+        void resize(size_type count, T value = T())
+        {
+            if (count < m_Size)
+            {
+                for(int i = count; i < m_Size; i++)
+                    m_Allocator.destroy(m_Data + i);
+                m_Size = count;
+            }
+            else
+            {
+                if (count > m_Capacity)
+                    reserve(m_Capacity * 2);
+                
+                for(int i = m_Size; i < (m_Size + count - m_Size); i++)
+                    m_Allocator.construct(m_Data + i, value);
+                m_Size = count;
+            }
+        }
+
+        /* pop back */
+        void pop_back()
+        {
+            m_Allocator.destroy(m_Data + m_Size);
+            m_Size--;
+        }
 
     private:
         size_type   m_Size;
         size_type   m_Capacity;
         pointer     m_Data;
-        pointer     m_End;
-        pointer     m_End_Cap;
         Allocator   m_Allocator;
 };
 
