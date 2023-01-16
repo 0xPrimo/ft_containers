@@ -73,8 +73,7 @@ class vector
                                         m_Capacity(other.m_Capacity),
                                         m_Allocator(other.allocator)
         {
-            m_Data = m_Allocator.allocate(other.m_Size);
-
+            m_Data = m_Allocator.allocate(other.m_Capacity);
             for(int i = 0; i < other.m_Size; i++)
                 m_Allocator.construct(m_Data + i, other.m_Data[i]);
         }
@@ -279,33 +278,79 @@ class vector
         /* insert */
         iterator insert(const_iterator pos, const T& value)
         {
-            size_type   index = &(*pos) - m_Data;
-            insert(pos, 1, value);
+            size_type empty_size = capacity() - size();
+            size_type index = &(*pos) - m_Data;
+
+            std::cout <<  empty_size << "----" << std::endl;
+            /* check if there is empty place */
+            if (empty_size == 0)
+            {
+                size_type new_cap = (m_Capacity * 2 > 0) ? m_Capacity * 2 : 1;
+                reserve(new_cap);
+            }
+            
+            m_Size++;
+            // shift the array by 1
+            for(int i = m_Size; i > index; i--)
+            {
+                m_Allocator.construct(m_Data + i, m_Data[i - 1]);
+                m_Allocator.destroy(m_Data + i - 1);
+            }
+            m_Allocator.construct(m_Data + index, value);
             return (iterator(m_Data + index));
         }
 
         iterator insert(const_iterator pos, size_type count, const T& value)
         {
+            size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
 
-            if (m_Size + count >= m_Capacity)
+            std::cout <<  empty_size << "----" << std::endl;
+            /* check if there is empty place */
+            if (empty_size == 0)
                 reserve(m_Size + count);
-            
+
+            m_Size += count;
             // shift the array by the count
-            for(int i = m_Size + count; i > index; i--)
+            for(int i = m_Size; i > index; i--)
             {
-                m_Allocator.construct(m_Data + i, m_Data[i - count]);  
+                m_Allocator.construct(m_Data + i, m_Data[i - count]);
                 m_Allocator.destroy(m_Data + i - count);
             }
+            for(int i = index; i < index + count; i++)
+                m_Allocator.construct(m_Data + i, value);
             return (iterator(m_Data + index));
         }
 
-        // template< class InputIt>
-        // iterator insert(const_iterator pos, InputIt first, InputIt last)
-        // {
+        template< class InputIt>
+        iterator insert(const_iterator pos, InputIt first, InputIt last)
+        {
+        
+            size_type empty_size = capacity() - size();
+            size_type index = &(*pos) - m_Data;
+            size_type count = std::distance(first, last);
 
-        // }
+            /* check if there is empty place */
+            if (empty_size == 0)
+                reserve(m_Capacity * 2);
 
+            m_Size += count;
+            
+            // shift the array by the count
+            for(int i = m_Size; i > index; i--)
+            {
+                m_Allocator.construct(m_Data + i, m_Data[i - count]);
+                m_Allocator.destroy(m_Data + i - count);
+            }
+            for(int i = index; first != last; first++)
+            {
+                m_Allocator.construct(m_Data + i, *first);
+                i++;
+            }
+            return (iterator(m_Data + index));
+
+        
+        }
         /* push back */
         void push_back(const T& value)
         {
@@ -321,6 +366,8 @@ class vector
         size_type   m_Size;
         size_type   m_Capacity;
         pointer     m_Data;
+        pointer     m_End;
+        pointer     m_End_Cap;
         Allocator   m_Allocator;
 };
 
