@@ -305,7 +305,6 @@ class vector
             size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
 
-            std::cout <<  empty_size << "----" << std::endl;
             /* check if there is empty place */
             if (empty_size == 0)
                 reserve(m_Size + count);
@@ -328,7 +327,7 @@ class vector
         
             size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
-            size_type count = std::distance(first, last);
+            size_type count = last - first;
 
             /* check if there is empty place */
             if (empty_size == 0)
@@ -387,6 +386,35 @@ class vector
         {
             m_Allocator.destroy(m_Data + m_Size);
             m_Size--;
+        }
+
+        /* erase */
+        iterator erase(iterator pos)
+        {
+            size_type index = &*pos - m_Data;
+
+            m_Allocator.destroy(m_data + index);
+            for(int i = index; i < m_Size; i++)
+            {
+                m_Allocator.construct(m_Data + i, m_Data[i + 1])
+                m_Allocator.destroy(m_Data + i + 1);
+            }
+            m_Size--;
+        }
+
+        iterator erase(iterator first, iterator last)
+        {
+            size_type   start_index = &*first - m_Data;
+            size_type   end_index = &*last - m_Data;
+    
+            for(; first != last; first++)
+                m_Allocator.destroy(&*first);
+            for(int i = start_index; i != m_Size; i++)
+            {
+                m_Allocator.construct(m_Data + i, m_Data[end_index + i]);
+                m_Allocator.destroy(m_Data + end_index + i);
+            }
+            m_Size -= 
         }
 
     private:
