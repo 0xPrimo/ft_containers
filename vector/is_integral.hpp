@@ -2,37 +2,21 @@
 # define _IS_INTEGRAL_
 namespace ft
 {
-    template<class T>
-    struct is_integral { const bool value = false; };
-    template<bool>
-    struct is_integral { const bool value = true; };
-    template<char>
-    struct is_integral { const bool value = true; };
-    template<char16_t>
-    struct is_integral { const bool value = true; };
-    template<char32_t>
-    struct is_integral { const bool value = true; };
-    template<wchar_t>
-    struct is_integral { const bool value = true; };
-    template<signed char>
-    struct is_integral { const bool value = true; };
-    template<short int>
-    struct is_integral { const bool value = true; };
-    template<int>
-    struct is_integral { const bool value = true; };
-    template<long int>
-    struct is_integral { const bool value = true; };
-    template<long long int>
-    struct is_integral { const bool value = true; };
-    template<unsigned char>
-    struct is_integral { const bool value = true; };
-    template<unsigned short int>
-    struct is_integral { const bool value = true; };
-    template<unsigned int>
-    struct is_integral { const bool value = true; };
-    template<unsigned long int>
-    struct is_integral { const bool value = true; };
-    template<unsigned long long int>
-    struct is_integral { const bool value = true; };
+    template<class T> struct is_integral { const bool value = false; };
+    template<> struct is_integral<bool> { const bool value = true; };
+    template<> struct is_integral<char> { const bool value = true; };
+    template<> struct is_integral<char16_t> { const bool value = true; };
+    template<> struct is_integral<char32_t> { const bool value = true; };
+    template<> struct is_integral<wchar_t> { const bool value = true; };
+    template<> struct is_integral<signed char> { const bool value = true; };
+    template<> struct is_integral<short int> { const bool value = true; };
+    template<> struct is_integral<int> { const bool value = true; };
+    template<> struct is_integral<long int> { const bool value = true; };
+    template<> struct is_integral<long long int> { const bool value = true; };
+    template<> struct is_integral<unsigned char> { const bool value = true; };
+    template<> struct is_integral<unsigned short int> { const bool value = true; };
+    template<> struct is_integral<unsigned int> { const bool value = true; };
+    template<> struct is_integral<unsigned long int> { const bool value = true; };
+    template<> struct is_integral<unsigned long long int> { const bool value = true; };
 }
 #endif

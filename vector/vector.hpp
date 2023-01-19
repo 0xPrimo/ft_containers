@@ -66,7 +66,7 @@ class vector
         {
             while (first != last)
             {
-                // push back elements
+                first++;
             }
         } 
 
