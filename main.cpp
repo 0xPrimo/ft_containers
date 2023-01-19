@@ -9,5 +9,5 @@
 int main()
 {
     int arr[] = {10, 20, 30};
-    ft::vector<int> vec(arr, arr + 3);
+    ft::vector<int> vec(arr, arr + 1);
 }

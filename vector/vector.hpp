@@ -62,7 +62,8 @@ class vector
 
         /* Iterator constructor */
         template <class InputIterator>
-        vector (InputIterator first, InputIterator last)
+        vector (InputIterator first, InputIterator last, const allocator_type &alloc = allocator_type(),
+            typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
             while (first != last)
             {
