@@ -5,6 +5,8 @@
 # include <cstring>
 # include "vector_iterator.hpp"
 # include "vector_reverse_iterator.hpp"
+# include "enable_if.hpp"
+# include "is_integral.hpp"
 
 namespace ft {
 
@@ -59,14 +61,14 @@ class vector
         }
 
         /* Iterator constructor */
-        // template <class InputIterator>
-        // vector (InputIterator first, InputIterator last)
-        // {
-        //     while (first != last)
-        //     {
-        //         // push back elements
-        //     }
-        // } 
+        template <class InputIterator>
+        vector (InputIterator first, InputIterator last)
+        {
+            while (first != last)
+            {
+                // push back elements
+            }
+        } 
 
         /* Copy Constructor */
         vector(const vector &other):    m_Size(other.m_Size),
@@ -393,13 +395,14 @@ class vector
         {
             size_type index = &*pos - m_Data;
 
-            m_Allocator.destroy(m_data + index);
+            m_Allocator.destroy(m_Data + index);
             for(int i = index; i < m_Size; i++)
             {
-                m_Allocator.construct(m_Data + i, m_Data[i + 1])
+                m_Allocator.construct(m_Data + i, m_Data[i + 1]);
                 m_Allocator.destroy(m_Data + i + 1);
             }
             m_Size--;
+            return (iterator(m_Data + index));
         }
 
         iterator erase(iterator first, iterator last)
@@ -414,7 +417,8 @@ class vector
                 m_Allocator.construct(m_Data + i, m_Data[end_index + i]);
                 m_Allocator.destroy(m_Data + end_index + i);
             }
-            m_Size -= 
+            m_Size -= (end_index - start_index) + 1;
+            return (iterator(m_Data + index));
         }
 
     private:
