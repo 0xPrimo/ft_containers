@@ -100,10 +100,47 @@ class vector
                 reserve(count);
             m_Size = count;
             for(int i = 0; i < count; i++)
-                m_Data[i] = value;
+            {
+                m_Allocator.destroy(m_Data + i);
+                m_Allocator.construct(m_Data + i, value);
+            }
         }
 
+        template< class InputIt >
+        void assign( InputIt first, InputIt last,
+                typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
+        {
+            size_type   distance = &*last - &*first;
 
+
+            std::cout << distance << std::endl;
+            if (distance > m_Size)
+            {
+                if (distance > m_Capacity)
+                    reserve(distance);
+                for(int i = 0; first != last; i++)
+                {
+                    if (i < m_Size)
+                        m_Allocator.destroy(m_Data + i);
+                    m_Allocator.construct(m_Data + i, *first);
+                    first++;
+                }
+                m_Size = distance;
+            }
+            else
+            {
+                for(int i = 0; i < m_Size; i++)
+                {
+                    m_Allocator.destroy(m_Data + i);
+                    if (first != last)
+                    {
+                        m_Allocator.construct(m_Data + i, *first);
+                        first++;
+                    }
+                }
+                m_Size = distance;
+            }
+        }
         /* Returns the allocator associated with the container */
         allocator_type get_allocator() const
         {
@@ -117,28 +154,28 @@ class vector
         reference at(size_type pos)
         {
             if (pos >= m_Size)
-                std::out_of_range("vector");
+                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
 
         const_reference at(size_type pos) const
         {
             if (pos >= m_Size)
-                std::out_of_range("vector");
+                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
-
+    
         reference operator[](size_type pos)
         {
             if (pos >= m_Size)
-                std::out_of_range("vector");
+                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
 
         const_reference operator[](size_type pos) const
         {
             if (pos >= m_Size)
-                std::out_of_range("vector");
+                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
 

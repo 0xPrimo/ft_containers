@@ -1,5 +1,4 @@
 #include "common.hpp"
-
 #define TESTED_TYPE int
 
 int		main(void)
