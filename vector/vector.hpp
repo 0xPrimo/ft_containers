@@ -24,14 +24,14 @@ class vector
         //                         Member types                           //
         ////////////////////////////////////////////////////////////////////
 
-        typedef     Allocator                                   allocator_type;
         typedef     typename Allocator::value_type              value_type;
-        typedef     typename Allocator::pointer                 pointer;
-        typedef     typename Allocator::const_pointer           const_pointer;
-        typedef     typename Allocator::reference               reference;
-        typedef     typename Allocator::const_reference         const_reference;
+        typedef     Allocator                                   allocator_type;
         typedef     typename Allocator::size_type               size_type;
         typedef     typename Allocator::difference_type         difference_type;
+        typedef     typename Allocator::reference               reference;
+        typedef     typename Allocator::const_reference         const_reference;
+        typedef     typename Allocator::pointer                 pointer;
+        typedef     typename Allocator::const_pointer           const_pointer;
 
 
         typedef     ft::Iterator<pointer>                       iterator;
@@ -65,11 +65,18 @@ class vector
         vector (InputIterator first, InputIterator last, const allocator_type &alloc = allocator_type(),
             typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
         {
+            size_type distance = &*last - &*first;
+            size_type i = 0;
+
+            reserve(distance);
             while (first != last)
             {
+                m_Allocator.construct(m_Data + i, *first);
                 first++;
+                i++;
             }
-        } 
+            m_Size = distance;
+        }
 
         /* Copy Constructor */
         vector(const vector &other):    m_Size(other.m_Size),
@@ -84,13 +91,20 @@ class vector
         /* Destructor */
         ~vector()
         {
-
+            for(size_type i = 0; i < m_Capacity; i++)
+                m_Allocator.destroy(m_Data + i);
+            m_Allocator.deallocate(m_Data, m_Capacity);
         }
 
         /* Assigns values to the container */
         vector& operator=(const vector &other)
         {
-            this->m_Ptr = other.Ptr;
+            if (other.m_Size > this->m_Capacity)
+                reserve(other.m_Size);
+            for(int i = 0; i < other.m_Size; i++)
+                m_Allocator.construct(m_Data + i, other.m_Data[i]);
+            m_Size = other.m_Size;
+            return (*this);
         }
 
         /* Assigns values to the container */
@@ -321,7 +335,6 @@ class vector
             size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
 
-            std::cout <<  empty_size << "----" << std::endl;
             /* check if there is empty place */
             if (empty_size == 0)
             {

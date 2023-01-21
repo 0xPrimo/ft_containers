@@ -11,17 +11,41 @@
     
 int main()  
 {
+    int *arr = (int *)malloc(sizeof(int) * 3);
 
-    std::vector<int> vec;
+    arr[0] = 10;
+    arr[1] = 20;
+    arr[2] = 30;
+    std::vector<int> vec(20, 20);
+    std::vector<int> vec2(10, 10);
 
-    for(int i = 0; i < 10; i++)
-        vec.push_back(i);
+    vec.push_back(10);
 
-    std::vector<int>::iterator it = vec.begin();
+    std::cout << "--------------------------------" << std::endl;
+    std::cout << "vec2 cap: " << vec2.capacity() << std::endl;
+    std::cout << "vec2 size: " << vec2.size() << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+    std::cout << "vec cap: " << vec.capacity() << std::endl;
+    std::cout << "vec size: " << vec.size() << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+
+
+    vec2 = vec;
+    
+    std::cout << "------------after--------------" << std::endl;
+    std::cout << "vec2 cap: " << vec2.capacity() << std::endl;
+    std::cout << "vec2 size: " << vec2.size() << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+    std::cout << "vec cap: " << vec.capacity() << std::endl;
+    std::cout << "vec size: " << vec.size() << std::endl;
+    std::cout << "--------------------------------" << std::endl;
+
+    std::vector<int>::iterator it = vec2.begin();
 
     try
     {
-        vec.at(100);
+        for(int i = 0; it != vec2.end(); it++)
+            std::cout << *it << std::endl;
     }
     catch(std::exception &ex)
     {
