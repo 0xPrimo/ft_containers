@@ -17,7 +17,6 @@ template <
 
 class vector
 {
-    
     public:
 
         ////////////////////////////////////////////////////////////////////
@@ -39,13 +38,15 @@ class vector
         typedef     ft::reverse_iterator<iterator>              reverse_iterator;
         typedef     ft::reverse_iterator<const_iterator>        const_reverse_iterator;
 
+    public:
         ////////////////////////////////////////////////////////////////////
         //                        Member functions                        //
         ////////////////////////////////////////////////////////////////////
         /* Default constructor */
         vector(const allocator_type& alloc = allocator_type()):     m_Size(0),
                                                                     m_Capacity(0),
-                                                                    m_Data(nullptr)
+                                                                    m_Data(nullptr),
+                                                                    m_Allocator(alloc)
         {
 
         }
@@ -56,14 +57,15 @@ class vector
         {
             m_Data = m_Allocator.allocate(m_Size);
 
-            for(int i = 0 ; i < n; i++)
+            for(size_type i = 0 ; i < n; i++)
                 m_Allocator.construct(m_Data + i, val);
         }
 
         /* Iterator constructor */
         template <class InputIterator>
         vector (InputIterator first, InputIterator last, const allocator_type &alloc = allocator_type(),
-            typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
+            typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0): 
+            m_Allocator(alloc)
         {
             size_type distance = &*last - &*first;
             size_type i = 0;
@@ -113,7 +115,7 @@ class vector
             if (count > m_Capacity)
                 reserve(count);
             m_Size = count;
-            for(int i = 0; i < count; i++)
+            for(size_type i = 0; i < count; i++)
             {
                 m_Allocator.destroy(m_Data + i);
                 m_Allocator.construct(m_Data + i, value);
@@ -124,15 +126,14 @@ class vector
         void assign( InputIt first, InputIt last,
                 typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
-            size_type   distance = &*last - &*first;
+            size_type   distance = std::distance(first, last);
 
 
-            std::cout << distance << std::endl;
             if (distance > m_Size)
             {
                 if (distance > m_Capacity)
                     reserve(distance);
-                for(int i = 0; first != last; i++)
+                for(size_type i = 0; first != last; i++)
                 {
                     if (i < m_Size)
                         m_Allocator.destroy(m_Data + i);
@@ -143,7 +144,7 @@ class vector
             }
             else
             {
-                for(int i = 0; i < m_Size; i++)
+                for(size_type i = 0; i < m_Size; i++)
                 {
                     m_Allocator.destroy(m_Data + i);
                     if (first != last)
@@ -302,9 +303,9 @@ class vector
             {
                 pointer ptr = m_Data;
                 m_Data = m_Allocator.allocate(new_cap);
-                for(int i = 0; i < m_Size; i++)
+                for(size_type i = 0; i < m_Size; i++)
                     m_Allocator.construct(m_Data + i, ptr[i]);
-                for(int i = 0; i < m_Size; i++)
+                for(size_type i = 0; i < m_Size; i++)
                     m_Allocator.destroy(ptr + i);
                 m_Allocator.deallocate(ptr, m_Size);
                 m_Capacity = new_cap;
@@ -323,7 +324,7 @@ class vector
         /* destroy all the elements of the container */
         void clear()
         {
-            for(int i = 0; i < m_Size; i++){
+            for(size_type i = 0; i < m_Size; i++){
                 m_Allocator.destroy(m_Data[i]);
             }
             m_Size = 0;
@@ -344,7 +345,7 @@ class vector
             
             m_Size++;
             // shift the array by 1
-            for(int i = m_Size; i > index; i--)
+            for(size_type i = m_Size; i > index; i--)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i - 1]);
                 m_Allocator.destroy(m_Data + i - 1);
@@ -364,12 +365,12 @@ class vector
 
             m_Size += count;
             // shift the array by the count
-            for(int i = m_Size; i > index; i--)
+            for(size_type i = m_Size; i > index; i--)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i - count]);
                 m_Allocator.destroy(m_Data + i - count);
             }
-            for(int i = index; i < index + count; i++)
+            for(size_type i = index; i < index + count; i++)
                 m_Allocator.construct(m_Data + i, value);
             return (iterator(m_Data + index));
         }
@@ -389,12 +390,12 @@ class vector
             m_Size += count;
             
             // shift the array by the count
-            for(int i = m_Size; i > index; i--)
+            for(size_type i = m_Size; i > index; i--)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i - count]);
                 m_Allocator.destroy(m_Data + i - count);
             }
-            for(int i = index; first != last; first++)
+            for(size_type i = index; first != last; first++)
             {
                 m_Allocator.construct(m_Data + i, *first);
                 i++;
@@ -419,7 +420,7 @@ class vector
         {
             if (count < m_Size)
             {
-                for(int i = count; i < m_Size; i++)
+                for(size_type i = count; i < m_Size; i++)
                     m_Allocator.destroy(m_Data + i);
                 m_Size = count;
             }
@@ -428,7 +429,7 @@ class vector
                 if (count > m_Capacity)
                     reserve(m_Capacity * 2);
                 
-                for(int i = m_Size; i < (m_Size + count - m_Size); i++)
+                for(size_type i = m_Size; i < (m_Size + count - m_Size); i++)
                     m_Allocator.construct(m_Data + i, value);
                 m_Size = count;
             }
@@ -447,7 +448,7 @@ class vector
             size_type index = &*pos - m_Data;
 
             m_Allocator.destroy(m_Data + index);
-            for(int i = index; i < m_Size; i++)
+            for(size_type i = index; i < m_Size; i++)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i + 1]);
                 m_Allocator.destroy(m_Data + i + 1);
@@ -463,7 +464,7 @@ class vector
     
             for(; first != last; first++)
                 m_Allocator.destroy(&*first);
-            for(int i = start_index; i != m_Size; i++)
+            for(size_type i = start_index; i != m_Size; i++)
             {
                 m_Allocator.construct(m_Data + i, m_Data[end_index + i]);
                 m_Allocator.destroy(m_Data + end_index + i);

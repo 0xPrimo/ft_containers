@@ -9,7 +9,7 @@ all: $(NAME)
 
 $(NAME):$(src)
 	@rm -rf bin
-	$(CC) $(src) -o $(NAME)
+	$(CC) -Wall -Wextra -Werror -std=c++98 $(src) -o $(NAME)
 
 debug:
 	$(CC) $(src) $(DFLAGS)

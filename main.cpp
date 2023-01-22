@@ -44,7 +44,7 @@ int main()
 
     try
     {
-        for(int i = 0; it != vec2.end(); it++)
+        for(; it != vec2.end(); it++)
             std::cout << *it << std::endl;
     }
     catch(std::exception &ex)
