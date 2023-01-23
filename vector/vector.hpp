@@ -38,6 +38,28 @@ class vector
         typedef     ft::reverse_iterator<iterator>              reverse_iterator;
         typedef     ft::reverse_iterator<const_iterator>        const_reverse_iterator;
 
+    private:
+        void destroy(pointer ptr, size_type size)
+        {
+            for(size_type i = 0; i < size; i++)
+                m_Allocator.destroy(ptr + i);
+        }
+
+        void construct(pointer ptr, size_type size, value_type &value)
+        {
+            for(size_type i = 0; i < size; i++)
+                m_Allocator.construct(ptr + i, value);
+        }
+
+        template <class it>
+        deference_type m_Distance(it first, it last)
+        {
+            deference_type i = 0;
+
+            for(; first != last; first++)
+                i++;
+            return i;
+        }
     public:
         ////////////////////////////////////////////////////////////////////
         //                        Member functions                        //
@@ -112,49 +134,30 @@ class vector
         /* Assigns values to the container */
         void    assign(size_type count, const T& value)
         {
+            if (count > m_Allocator.max_size())
+                throw std::length_error("vector");
+            
+            destroy(m_Data, m_Size);
+            
             if (count > m_Capacity)
-                reserve(count);
-            m_Size = count;
-            for(size_type i = 0; i < count; i++)
             {
-                m_Allocator.destroy(m_Data + i);
-                m_Allocator.construct(m_Data + i, value);
+                m_Allocator.deallocate(m_Data, m_Capacity);
+                m_Data = m_Allocator.allocate(count);
+                m_Capacity = count;
             }
+            construct(m_Data, count, value);
+            m_Size = count;
         }
 
         template< class InputIt >
         void assign( InputIt first, InputIt last,
                 typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
-            size_type   distance = std::distance(first, last);
-
-
-            if (distance > m_Size)
-            {
-                if (distance > m_Capacity)
-                    reserve(distance);
-                for(size_type i = 0; first != last; i++)
-                {
-                    if (i < m_Size)
-                        m_Allocator.destroy(m_Data + i);
-                    m_Allocator.construct(m_Data + i, *first);
-                    first++;
-                }
-                m_Size = distance;
-            }
-            else
-            {
-                for(size_type i = 0; i < m_Size; i++)
-                {
-                    m_Allocator.destroy(m_Data + i);
-                    if (first != last)
-                    {
-                        m_Allocator.construct(m_Data + i, *first);
-                        first++;
-                    }
-                }
-                m_Size = distance;
-            }
+            difference_type size = m_Distance(first, last);
+            clear();
+            if (size > m_Capacity)
+                reserve(size);
+            
         }
         /* Returns the allocator associated with the container */
         allocator_type get_allocator() const

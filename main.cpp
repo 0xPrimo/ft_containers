@@ -7,48 +7,14 @@
 #include "vector/vector.hpp"
 #include <algorithm>
 #include <string>
-    
+#include <memory>
     
 int main()  
 {
-    int *arr = (int *)malloc(sizeof(int) * 3);
-
-    arr[0] = 10;
-    arr[1] = 20;
-    arr[2] = 30;
-    std::vector<int> vec(20, 20);
-    std::vector<int> vec2(10, 10);
-
-    vec.push_back(10);
-
-    std::cout << "--------------------------------" << std::endl;
-    std::cout << "vec2 cap: " << vec2.capacity() << std::endl;
-    std::cout << "vec2 size: " << vec2.size() << std::endl;
-    std::cout << "--------------------------------" << std::endl;
-    std::cout << "vec cap: " << vec.capacity() << std::endl;
-    std::cout << "vec size: " << vec.size() << std::endl;
-    std::cout << "--------------------------------" << std::endl;
+    std::allocator<int> alloc;
 
 
-    vec2 = vec;
-    
-    std::cout << "------------after--------------" << std::endl;
-    std::cout << "vec2 cap: " << vec2.capacity() << std::endl;
-    std::cout << "vec2 size: " << vec2.size() << std::endl;
-    std::cout << "--------------------------------" << std::endl;
-    std::cout << "vec cap: " << vec.capacity() << std::endl;
-    std::cout << "vec size: " << vec.size() << std::endl;
-    std::cout << "--------------------------------" << std::endl;
-
-    std::vector<int>::iterator it = vec2.begin();
-
-    try
-    {
-        for(; it != vec2.end(); it++)
-            std::cout << *it << std::endl;
-    }
-    catch(std::exception &ex)
-    {
-        std::cout << ex.what() << std::endl;
-    }
+    int *ptr = alloc.allocate(20);
+    ptr = alloc.allocate(20);
+    alloc.deallocate(ptr, 20);
 }
