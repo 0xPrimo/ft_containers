@@ -7,13 +7,11 @@
 # include "vector_reverse_iterator.hpp"
 # include "../utils/enable_if.hpp"
 # include "../utils/is_integral.hpp"
+# include "../utils/lexicographical_compare.hpp"
 
 namespace ft {
 
-template <
-            class T,
-            class Allocator = std::allocator<T>
->
+template < class T, class Allocator = std::allocator<T> >
 
 class vector
 {
@@ -37,7 +35,6 @@ class vector
         typedef     ft::Iterator<const_pointer>                 const_iterator;
         typedef     ft::reverse_iterator<iterator>              reverse_iterator;
         typedef     ft::reverse_iterator<const_iterator>        const_reverse_iterator;
-
     private:
         void destroy(pointer ptr, size_type size)
         {
@@ -45,21 +42,23 @@ class vector
                 m_Allocator.destroy(ptr + i);
         }
 
-        void construct(pointer ptr, size_type size, value_type &value)
+        void construct(pointer ptr, size_type size, value_type value)
         {
             for(size_type i = 0; i < size; i++)
                 m_Allocator.construct(ptr + i, value);
         }
 
         template <class it>
-        deference_type m_Distance(it first, it last)
+        difference_type m_Distance(it first, it last)
         {
-            deference_type i = 0;
+            difference_type i = 0;
 
             for(; first != last; first++)
                 i++;
             return i;
         }
+
+
     public:
         ////////////////////////////////////////////////////////////////////
         //                        Member functions                        //
@@ -70,7 +69,6 @@ class vector
                                                                     m_Data(nullptr),
                                                                     m_Allocator(alloc)
         {
-
         }
 
         /* Size constructor */
@@ -87,12 +85,17 @@ class vector
         template <class InputIterator>
         vector (InputIterator first, InputIterator last, const allocator_type &alloc = allocator_type(),
             typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0): 
+            m_Size(0),
+            m_Capacity(0),
+            m_Data(NULL),
             m_Allocator(alloc)
         {
+
             size_type distance = &*last - &*first;
             size_type i = 0;
 
             reserve(distance);
+
             while (first != last)
             {
                 m_Allocator.construct(m_Data + i, *first);
@@ -105,27 +108,29 @@ class vector
         /* Copy Constructor */
         vector(const vector &other):    m_Size(other.m_Size),
                                         m_Capacity(other.m_Capacity),
-                                        m_Allocator(other.allocator)
+                                        m_Allocator(other.m_Allocator)
         {
             m_Data = m_Allocator.allocate(other.m_Capacity);
-            for(int i = 0; i < other.m_Size; i++)
+            for(size_type i = 0; i < other.m_Size; i++)
                 m_Allocator.construct(m_Data + i, other.m_Data[i]);
         }
 
         /* Destructor */
         ~vector()
         {
-            for(size_type i = 0; i < m_Capacity; i++)
+            for(size_type i = 0; i < m_Size; i++)
                 m_Allocator.destroy(m_Data + i);
-            m_Allocator.deallocate(m_Data, m_Capacity);
+            if (m_Capacity)
+                m_Allocator.deallocate(m_Data, m_Capacity);
         }
 
         /* Assigns values to the container */
         vector& operator=(const vector &other)
         {
+            clear();
             if (other.m_Size > this->m_Capacity)
                 reserve(other.m_Size);
-            for(int i = 0; i < other.m_Size; i++)
+            for(size_type i = 0; i < other.m_Size; i++)
                 m_Allocator.construct(m_Data + i, other.m_Data[i]);
             m_Size = other.m_Size;
             return (*this);
@@ -136,12 +141,13 @@ class vector
         {
             if (count > m_Allocator.max_size())
                 throw std::length_error("vector");
-            
+
+
             destroy(m_Data, m_Size);
-            
             if (count > m_Capacity)
             {
-                m_Allocator.deallocate(m_Data, m_Capacity);
+                if (m_Capacity)
+                    m_Allocator.deallocate(m_Data, m_Capacity);
                 m_Data = m_Allocator.allocate(count);
                 m_Capacity = count;
             }
@@ -153,12 +159,21 @@ class vector
         void assign( InputIt first, InputIt last,
                 typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
-            difference_type size = m_Distance(first, last);
+            InputIt _first(first), _last(last);
+            size_type size = m_Distance(_first, _last);
+
             clear();
             if (size > m_Capacity)
                 reserve(size);
-            
+            for(size_type i = 0; first != last; first++)
+            {
+                m_Allocator.construct(m_Data + i, *first);
+                i++;
+            }
+            m_Size = size;
         }
+
+
         /* Returns the allocator associated with the container */
         allocator_type get_allocator() const
         {
@@ -211,12 +226,12 @@ class vector
         /* Access the last element */
         reference back()
         {
-            return (*(m_Data + m_Size));
+            return (*(m_Data + (m_Size - 1)));
         }
 
         reference back() const
         {
-            return (*(m_Data + m_Size));
+            return (*(m_Data + (m_Size - 1)));
         }
         
         pointer data()
@@ -306,11 +321,12 @@ class vector
             {
                 pointer ptr = m_Data;
                 m_Data = m_Allocator.allocate(new_cap);
-                for(size_type i = 0; i < m_Size; i++)
+                for(size_type i = 0; i < m_Size && m_Capacity; i++)
                     m_Allocator.construct(m_Data + i, ptr[i]);
-                for(size_type i = 0; i < m_Size; i++)
+                for(size_type i = 0; i < m_Size && m_Capacity; i++)
                     m_Allocator.destroy(ptr + i);
-                m_Allocator.deallocate(ptr, m_Size);
+                if (m_Capacity)
+                    m_Allocator.deallocate(ptr, m_Capacity);
                 m_Capacity = new_cap;
             }
         }
@@ -327,9 +343,7 @@ class vector
         /* destroy all the elements of the container */
         void clear()
         {
-            for(size_type i = 0; i < m_Size; i++){
-                m_Allocator.destroy(m_Data[i]);
-            }
+            destroy(m_Data, m_Size);
             m_Size = 0;
         }
 
@@ -486,7 +500,53 @@ class vector
         ////////////////////////////////////////////////////////////////////
         //                        Non-member functions                    //
         ////////////////////////////////////////////////////////////////////
-        /**/
 
+    template <class T, class allocator>
+    bool    operator==(const vector<T, allocator> &vec1, const vector<T, allocator> &vec2)
+    {
+        if (vec1.size() != vec2.size())
+            return (false);
+        for(size_t i = 0; i < vec1.size(); i++)
+            if (vec1[i] != vec2[i])
+                return (false);
+        return (true);
+    }
+
+    template <class T, class allocator>
+    bool    operator!=(const vector<T, allocator> &vec1, const vector<T, allocator> &vec2)
+    {
+        return (!operator==(vec1, vec2));
+    }
+
+    template <class T, class allocator>
+    bool    operator<(const vector<T, allocator> &vec1, const vector<T, allocator> &vec2)
+    {
+        return (ft::lexicographical_compare(vec1.begin(), vec1.end(), vec2.begin(), vec2.end()));
+    }
+
+    template <class T, class allocator>
+    bool    operator>(vector<T, allocator> vec1, vector<T, allocator> vec2)
+    {
+            return (!(vec1 < vec2));
+    }
+
+    template <class T, class allocator>
+    bool    operator<=(vector<T, allocator> vec1, vector<T, allocator> vec2)
+    {
+        if (vec1 < vec2 || vec1 == vec2)
+            return (true)
+        return (false);
+    }
+
+    template <class T, class allocator>
+    bool    operator<(vector<T, allocator> vec1, vector<T, allocator> vec2)
+    {
+        if (vec1.size() != vec2.size())
+            return (false);
+        for(size_t i = 0; i < vec1.size(); i++)
+            if (vec1[i] >= vec2[i])
+                return (false);
+        return (true);
+    }
 }
 #endif

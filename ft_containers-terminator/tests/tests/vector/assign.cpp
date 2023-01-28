@@ -39,7 +39,7 @@ void vec_test_assign()
     }
 
     {
-        strvector v;
+        ft::vector<std::string> v;
 
         v.assign(0, "");
 

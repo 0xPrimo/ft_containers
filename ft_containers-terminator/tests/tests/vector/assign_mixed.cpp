@@ -17,7 +17,7 @@ void test_vec_assign_mixed()
     SETUP_ARRAYS();
 
     {
-        strvector v;
+        ft::vector<std::string> v;
 
         v.assign(b_string, b_string + b_size);
 

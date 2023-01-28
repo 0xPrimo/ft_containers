@@ -4,7 +4,8 @@
 # include "vector_iterator_traits.hpp"
 namespace ft
 {
-    template <class T> class Iterator
+    template <class T>
+    class Iterator
     {
         public:
 

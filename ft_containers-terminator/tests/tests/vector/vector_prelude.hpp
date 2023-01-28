@@ -114,7 +114,10 @@ typedef NAMESPACE::vector<std::string, track_allocator<std::string> > strvector;
 typedef NAMESPACE::vector<int, track_allocator<int> > intvector;
 typedef NAMESPACE::vector<long, track_allocator<long> > longvector;
 typedef NAMESPACE::vector<double, track_allocator<double> > doublevector;
-typedef NAMESPACE::vector<char, track_allocator<char> > charvector;
+typedef std::vector<char, track_allocator<char> > charvector;
+
+
+
 
 template <typename T>
 T times2(const T& x)
