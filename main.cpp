@@ -10,43 +10,21 @@
 #include <memory>
 
 
-#define A_SIZE 64
-#define B_SIZE 32
-
-// {
-//     charvector v;
-
-//     v.assign(0, 'c');
-
-//     CHECK_AND_PRINT_ALL(v);
-
-//     v.assign(64, 'A');
-
-//     CHECK_AND_PRINT_ALL(v);
-
-//     v.assign(32, '5');
-
-//     CHECK_AND_PRINT_ALL(v);
-
-//     v.assign(49, '8');
-
-//     CHECK_AND_PRINT_ALL(v);
-
-//     v.assign(77, '2');
-
-//     CHECK_AND_PRINT_ALL(v);
-// }
-
 int main()  
 {
 
     {
         
-        int a[] = {10, 20, 30, 40, 50};
+        int a[64];
+        for(int i = 0; i < 64; i++)
+            a[i] = i;
 
 
-        std::vector<int> v;
-        int c = 20;
-        v.assign(a, &c);
+
+        ft::vector<int> v(a, a + 64);
+        // v.insert(v.end(), 10, 64);
+        
+        v.insert(v.begin(), 5, -1);
+
     }
 }

@@ -75,10 +75,15 @@ class vector
         vector(size_type n, const value_type &val = value_type()):  m_Size(n),
                                                                     m_Capacity(n)
         {
-            m_Data = m_Allocator.allocate(m_Size);
+            if (n > m_Allocator.max_size())
+                throw std::length_error("vector"); 
+            if (n)
+            {
+                m_Data = m_Allocator.allocate(m_Size);
 
-            for(size_type i = 0 ; i < n; i++)
-                m_Allocator.construct(m_Data + i, val);
+                for(size_type i = 0 ; i < n; i++)
+                    m_Allocator.construct(m_Data + i, val);
+            }
         }
 
         /* Iterator constructor */
@@ -362,7 +367,7 @@ class vector
             
             m_Size++;
             // shift the array by 1
-            for(size_type i = m_Size; i > index; i--)
+            for(size_type i = m_Size - 1; i > index; i--)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i - 1]);
                 m_Allocator.destroy(m_Data + i - 1);
@@ -373,32 +378,42 @@ class vector
 
         iterator insert(const_iterator pos, size_type count, const T& value)
         {
-            size_type empty_size = capacity() - size();
-            size_type index = &(*pos) - m_Data;
+            difference_type index = &*pos - &*begin();
 
-            /* check if there is empty place */
-            if (empty_size == 0)
-                reserve(m_Size + count);
+            if (count == 0)
+                return(iterator(m_Data + index));
 
-            m_Size += count;
-            // shift the array by the count
-            for(size_type i = m_Size; i > index; i--)
+            if (m_Size + count > m_Capacity)
+                reserve(m_Capacity + count);
+
+            iterator        new_pos(m_Data + index);
+            if (new_pos != end())
             {
-                m_Allocator.construct(m_Data + i, m_Data[i - count]);
-                m_Allocator.destroy(m_Data + i - count);
+
+                for(iterator first(m_Data + (m_Size - 1)), second(m_Data + m_Size);
+                    second != new_pos; --first, --second)
+                {
+
+                    m_Allocator.construct(&(*(first + count)), *first);
+                    m_Allocator.destroy(&(*first));
+                
+                }
             }
-            for(size_type i = index; i < index + count; i++)
-                m_Allocator.construct(m_Data + i, value);
+
+            for(size_type i = 0; i < count; i++)
+                m_Allocator.construct(&(*new_pos++), value);
+            m_Size += count;
             return (iterator(m_Data + index));
         }
 
         template< class InputIt>
-        iterator insert(const_iterator pos, InputIt first, InputIt last)
+        iterator insert(const_iterator pos, InputIt first, InputIt last,
+            typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
         
             size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
-            size_type count = last - first;
+            size_type count = &*last - &*first;
 
             /* check if there is empty place */
             if (empty_size == 0)
@@ -465,7 +480,7 @@ class vector
             size_type index = &*pos - m_Data;
 
             m_Allocator.destroy(m_Data + index);
-            for(size_type i = index; i < m_Size; i++)
+            for(size_type i = index; i < m_Size - 1; i++)
             {
                 m_Allocator.construct(m_Data + i, m_Data[i + 1]);
                 m_Allocator.destroy(m_Data + i + 1);
@@ -478,16 +493,22 @@ class vector
         {
             size_type   start_index = &*first - m_Data;
             size_type   end_index = &*last - m_Data;
-    
-            for(; first != last; first++)
-                m_Allocator.destroy(&*first);
-            for(size_type i = start_index; i != m_Size; i++)
+
+            if (first != last)
             {
-                m_Allocator.construct(m_Data + i, m_Data[end_index + i]);
-                m_Allocator.destroy(m_Data + end_index + i);
+                for(size_type i = start_index, j = 0; j < m_Size; j++, i++)
+                {
+                    if (i < end_index)
+                        m_Allocator.destroy(m_Data + i);
+                    if (j + end_index < m_Size)
+                    {
+                        m_Allocator.construct(m_Data + i, *(last + j));
+                        m_Allocator.destroy(m_Data + end_index + j);
+                    }
+                }
             }
-            m_Size -= (end_index - start_index) + 1;
-            return (iterator(m_Data + index));
+            m_Size -= (end_index - start_index);
+            return (iterator((m_Data + start_index)));
         }
 
     private:
@@ -527,26 +548,23 @@ class vector
     template <class T, class allocator>
     bool    operator>(vector<T, allocator> vec1, vector<T, allocator> vec2)
     {
-            return (!(vec1 < vec2));
+        return (vec2 < vec1);
     }
 
     template <class T, class allocator>
     bool    operator<=(vector<T, allocator> vec1, vector<T, allocator> vec2)
     {
         if (vec1 < vec2 || vec1 == vec2)
-            return (true)
+            return (true);
         return (false);
     }
 
     template <class T, class allocator>
-    bool    operator<(vector<T, allocator> vec1, vector<T, allocator> vec2)
+    bool    operator>=(vector<T, allocator> vec1, vector<T, allocator> vec2)
     {
-        if (vec1.size() != vec2.size())
-            return (false);
-        for(size_t i = 0; i < vec1.size(); i++)
-            if (vec1[i] >= vec2[i])
-                return (false);
-        return (true);
+        if (vec1 > vec2 || vec1 == vec2)
+            return (true);
+        return (false);
     }
 }
 #endif
