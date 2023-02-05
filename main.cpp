@@ -12,7 +12,6 @@
 
 int main()  
 {
-
     {
         
         int a[64];
@@ -22,9 +21,18 @@ int main()
 
 
         ft::vector<int> v(a, a + 64);
-        // v.insert(v.end(), 10, 64);
         
-        v.insert(v.begin(), 5, -1);
+        // v.resize(14, "hello mate");
+        
+        // ft::vector<int>::reverse_iterator it = v.rend() - 1;
+        ft::vector<int>::reverse_iterator it2 = v.rbegin();
+        // ft::vector<std::string>::const_reverse_iterator cit = v.rbegin();
+        // ft::vector<std::string>::const_reverse_iterator cit2 = v.rbegin();
 
+
+        std::cout << it2[2] << std::endl;
+        // std::cout << *it << std::endl;
+        // if (v.rbegin() == cit)
+        //     std::cout << "true" << std::endl;
     }
 }

@@ -3,6 +3,7 @@
 
 # include <memory>
 # include <cstring>
+# include <cmath>
 # include "vector_iterator.hpp"
 # include "vector_reverse_iterator.hpp"
 # include "../utils/enable_if.hpp"
@@ -314,6 +315,8 @@ class vector
         /* Returns the maximum possible number of elements */
         size_type max_size() const
         {
+            if (sizeof(value_type) == 1)
+                return(pow(2.0, 64.0));
             return (m_Allocator.max_size());
         }
 
@@ -322,6 +325,7 @@ class vector
         {
             if (new_cap > m_Allocator.max_size())
                 throw std::length_error("vector");
+
             if (new_cap > m_Capacity)
             {
                 pointer ptr = m_Data;
@@ -411,27 +415,37 @@ class vector
             typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
         
-            size_type empty_size = capacity() - size();
             size_type index = &(*pos) - m_Data;
-            size_type count = &*last - &*first;
+            size_type count = m_Distance(first, last);
 
             /* check if there is empty place */
-            if (empty_size == 0)
-                reserve(m_Capacity * 2);
+            if (count == 0)
+                return(iterator(m_Data + index));
 
-            m_Size += count;
+            if (m_Size + count > m_Capacity)
+                reserve(m_Capacity + count);
             
             // shift the array by the count
-            for(size_type i = m_Size; i > index; i--)
+            iterator new_pos(m_Data + index);
+            if (new_pos != end())
             {
-                m_Allocator.construct(m_Data + i, m_Data[i - count]);
-                m_Allocator.destroy(m_Data + i - count);
+                for(iterator first(m_Data + (m_Size - 1)), second(m_Data + m_Size);
+                    second != new_pos; --first, --second)
+                {
+
+                    m_Allocator.construct(&(*(first + count)), *first);
+                    m_Allocator.destroy(&(*first));
+                
+                }
             }
+
             for(size_type i = index; first != last; first++)
             {
                 m_Allocator.construct(m_Data + i, *first);
                 i++;
             }
+
+            m_Size += count;
             return (iterator(m_Data + index));
 
         
@@ -450,27 +464,24 @@ class vector
         /* resize */
         void resize(size_type count, T value = T())
         {
-            if (count < m_Size)
-            {
-                for(size_type i = count; i < m_Size; i++)
-                    m_Allocator.destroy(m_Data + i);
-                m_Size = count;
-            }
-            else
-            {
-                if (count > m_Capacity)
-                    reserve(m_Capacity * 2);
-                
-                for(size_type i = m_Size; i < (m_Size + count - m_Size); i++)
+            if (count > m_Capacity * 2)
+                reserve(count);
+            else if (count > m_Capacity)
+                reserve(m_Capacity * 2);
+            
+            if (count > m_Size)
+                for(size_type i = m_Size; i < count; i++)
                     m_Allocator.construct(m_Data + i, value);
-                m_Size = count;
-            }
+            else
+                for(size_type i = m_Size; i > count; i--)
+                    m_Allocator.destroy(m_Data + (i - 1));
+            m_Size = count;
         }
 
         /* pop back */
         void pop_back()
         {
-            m_Allocator.destroy(m_Data + m_Size);
+            m_Allocator.destroy(m_Data + (m_Size - 1));
             m_Size--;
         }
 
@@ -509,6 +520,23 @@ class vector
             }
             m_Size -= (end_index - start_index);
             return (iterator((m_Data + start_index)));
+        }
+
+        void swap(vector &b)
+        {
+            swap(m_Data, b.m_Data);
+            swap(m_Size, b.m_Size);
+            swap(m_Capacity, b.m_Capacity);
+            swap(m_Allocator, b.m_Allocator);
+        }
+    private:
+        template<class type>
+        void swap(type &a, type &b)
+        {
+            type tmp;
+            tmp = a;
+            a = b;
+            b = tmp;
         }
 
     private:
@@ -565,6 +593,13 @@ class vector
         if (vec1 > vec2 || vec1 == vec2)
             return (true);
         return (false);
+    }
+
+
+    template <class T, class allocator>
+    void swap(vector<T, allocator> &a, vector<T, allocator> &b)
+    {
+        a.swap(b);
     }
 }
 #endif

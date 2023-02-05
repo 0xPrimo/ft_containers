@@ -74,9 +74,6 @@ namespace ft
 
             reference operator[](int index) const
             {
-                // if (index < 0){
-                //     // throw exception
-                // }
                 return (*(m_Ptr + index));
             }
 
@@ -90,21 +87,48 @@ namespace ft
                 return (Iterator(m_Ptr - n));
             }
 
-            Iterator operator+=(difference_type n) const
+            difference_type operator-(const Iterator &other) const
             {
-                return (Iterator(m_Ptr + n));
+                return (this->m_Ptr - other.m_Ptr);
             }
 
-            Iterator operator-=(difference_type n) const
+            Iterator &operator+=(difference_type n)
             {
-                return (Iterator(m_Ptr - n));
+                this->m_Ptr += n;              
+                return (*this);
+            }
+
+            Iterator &operator-=(difference_type n)
+            {
+                this->m_Ptr -= n;
+                return (*this);
             }
 
         private:
             pointer     m_Ptr;
 
     };
-}
+
+    template <class it>
+    Iterator<it> operator-(int n, const Iterator<it> &other)
+    {
+        Iterator<it> tmp(other);
+
+        tmp -= n;
+
+        return (tmp);
+    }
+
+    template <class it>
+    Iterator<it> operator+(int n, const Iterator<it> &other)
+    {
+        Iterator<it> tmp(other);
+
+        tmp += n;
+
+        return (tmp);
+    }
+
     template <class it1, class it2>
     bool operator==(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
     {
@@ -153,4 +177,5 @@ namespace ft
         return (false);
     }
 
+}
 #endif
