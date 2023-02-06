@@ -9,7 +9,7 @@ all: $(NAME)
 
 $(NAME):$(src)
 	@rm -rf bin
-	$(CC)  -fsanitize=address -g -std=c++98 $(src) -o $(NAME)
+	$(CC)  -std=c++98 $(src) -o $(NAME)
 
 debug:
 	$(CC) $(src) $(DFLAGS)
