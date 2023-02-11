@@ -12,15 +12,26 @@ struct pair
         first_type  first;
         second_type second;
     
-    pair()
+    pair(): first(), second()
     {
 
     }
 
+    template<class T1, class T2>
+    pair(const pair<T1, T2> &other): first(other.first), second(other.second)
+    {
+
+    }
+    
     pair &operator(const pair &other)
     {
-
+        if (*this == other)
+            return (*this);
+        first = other.first;
+        second = other.second;
+        return (*this);
     }
-
 };
+
+    
 #endif
