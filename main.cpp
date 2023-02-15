@@ -1,23 +1,12 @@
-#include <iostream>
-#include <iterator>
-#include <vector>
-#include <list>
-#include <memory>
-#include <type_traits>
-#include "vector/vector.hpp"
-#include "vector/stack.hpp"
-#include <algorithm>
-#include <string>
-#include <memory>
+#include "rb.hpp"
 
-
-int main()  
+int main()
 {
-    {
-        ft::stack<int> stack;
+    rb tree;
+    int arr[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
-
-        
-
-    }
+    for(int i = 0; i < 10; i++)
+        tree.insert(arr[i]);
+    
+    return (0);
 }
