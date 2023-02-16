@@ -1,12 +1,12 @@
-#include "rb.hpp"
+#include "containers/RedBlackTree.hpp"
 
 int main()
 {
-    rb tree;
-    int arr[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    RedBlackTree<int> tree;
+    int arr[] = {9, 123 , 1, 4534, 66};
 
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 5; i++)
         tree.insert(arr[i]);
-    
+    tree.print();
     return (0);
 }

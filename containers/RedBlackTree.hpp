@@ -1,12 +1,20 @@
 #ifndef _RBTREE_
 # define _RBTREE_
 # include <memory>
-# include "../utils/pair.hpp"
+# include <string>
+# include <iostream>
+// # include "../utils/pair.hpp"
 
 # define RED 0
 # define BLACK 1
 # define LEFT 0
 # define RIGHT 1
+
+
+/* Colors */
+#define RESET "\033[m"
+#define REED   "\033[0;31m"
+
 
 template< class T>
 struct Node
@@ -23,7 +31,7 @@ struct Node
 };
 
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
-template<class T, class comp = std::less< T >, class alloc = std::allocator<T>>
+template< class T, class comp = std::less<T> , class alloc = std::allocator<T> >
 class RedBlackTree
 {
     public:
@@ -42,23 +50,63 @@ class RedBlackTree
         allocator_type  allocator;
     
     private:
-        node *newNode(value_type const &value, node *parent, int color)
+        node *newNode(value_type const &value, node *parent, int side)
         {
-            node *newnode = allocator.allocate(1);
-
-            allocator.construct(&(newnode->value), value);
-            newnode->color = color;
+            node *newnode = new node;
+            
+            newnode->value = allocator.allocate(1);
+            allocator.construct(newnode->value, value);
+            newnode->side = side;
+            newnode->color = RED;
             newnode->parent = parent;
             newnode->left = NULL;
             newnode->right = NULL;
+            return (newnode);
+        }
+    private:
+        void BalanceTreeInsert(node *curr)
+        {
+
+        }
+    
+        void printBT(const std::string& prefix, const node* node, bool isLeft)
+        {
+            if( node != nullptr )
+            {
+                std::cout << prefix;
+
+                std::cout << (isLeft ? "├──" : "└──" );
+
+                // print the value of the node
+                std::cout << (node->color ? RESET: REED) << *node->value << RESET << std::endl;
+                
+                
+                // enter the next tree level - left and right branch
+                printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
+                printBT( prefix + (isLeft ? "│   " : "    "), node->right, false);
+            }
+        }
+
+        void printBT(const node* node)
+        {
+            printBT("", node, false);
         }
 
     public:
-        RedBlackTree(): root(0), size(0) {}
+        void print()
+        {
+            printBT(root);
+        }
 
+
+    public:
+        RedBlackTree(): root(NULL), size(0)
+        {
+
+        }
         void insert( value_type const &value)
         {
-            if (!root && size++)
+            if (!root && !size++)
                 root = newNode(value, NULL, BLACK);
             else
             {
@@ -67,17 +115,27 @@ class RedBlackTree
                 while (tmp != NULL)
                 {
                     parent = tmp;
-                    if (comp(value, tmp->value))
+                    if (value < *(tmp->value))
                         tmp = tmp->left;
-                    else if (comp(tmp->value, value))
+                    else if (*(tmp->value) < value)
                         tmp = tmp->right;
                 }
-                tmp = newNode(value, parent, RED);
-                if (comp(value, parent->value))
-                    parent->left = tmp;
+
+                if (value < *parent->value)
+                {   
+                    parent->left = newNode(value, parent, LEFT);
+                    // BalanceTreeInsert(parent->left);
+                }
                 else
-                    parent->right = tmp;
+                {
+                    parent->right = newNode(value, parent, RIGHT);
+                    // BalanceTreeInsert(parent->right);
+                }
             }
+            size++;
+            /* balance the tree */
+
+            
         }
 
 };
