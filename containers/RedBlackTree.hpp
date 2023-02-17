@@ -63,11 +63,7 @@ class RedBlackTree
             newnode->right = NULL;
             return (newnode);
         }
-    private:
-        void BalanceTreeInsert(node *curr)
-        {
 
-        }
     
         void printBT(const std::string& prefix, const node* node, bool isLeft)
         {
@@ -78,7 +74,7 @@ class RedBlackTree
                 std::cout << (isLeft ? "├──" : "└──" );
 
                 // print the value of the node
-                std::cout << (node->color ? RESET: REED) << *node->value << RESET << std::endl;
+                std::cout << (node->color ? RESET: REED) << *node->value << RESET << (node->side ? " Right" : " Left") << std::endl;
                 
                 
                 // enter the next tree level - left and right branch
@@ -97,7 +93,47 @@ class RedBlackTree
         {
             printBT(root);
         }
+    private:
+        void BalanceTreeInsert(node *curr)
+        {
+            while (curr != root && curr->color == RED && curr->parent->color == RED)
+            {
+                node *GrandNode = curr->parent->parent;
+                if (GrandNode->right == curr->parent) // we are at the right side of the tree
+                {
+                    if (GrandNode->left->color == RED) // Swap colors
+                    {
+                        GrandNode->color = BLACK;
+                        GrandNode->left->color = BLACK;
+                        GrandNode->parent->color = RED;
 
+                        curr = GrandNode; // balance the grand node
+                    }
+                    else // do a left rotation
+                    {
+
+                    }
+                }
+                else // we are at the left side of the tree
+                {
+                    if (GrandNode->left->color == RED) // Swap colors
+                    {
+                        GrandNode->color = BLACK;
+                        GrandNode->right->color = BLACK;
+                        GrandNode->parent->color = RED;
+
+                        curr = GrandNode; // balance the grand node
+                    }
+                    else // do a right rotation
+                    {
+
+
+
+                    }
+                }
+                
+            }
+        }
 
     public:
         RedBlackTree(): root(NULL), size(0)
@@ -120,22 +156,20 @@ class RedBlackTree
                     else if (*(tmp->value) < value)
                         tmp = tmp->right;
                 }
-
                 if (value < *parent->value)
                 {   
                     parent->left = newNode(value, parent, LEFT);
-                    // BalanceTreeInsert(parent->left);
+                    BalanceTreeInsert(parent->left);
                 }
                 else
                 {
                     parent->right = newNode(value, parent, RIGHT);
-                    // BalanceTreeInsert(parent->right);
+                    BalanceTreeInsert(parent->right);
                 }
             }
             size++;
             /* balance the tree */
 
-            
         }
 
 };

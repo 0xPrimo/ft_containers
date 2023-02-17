@@ -3,9 +3,9 @@
 int main()
 {
     RedBlackTree<int> tree;
-    int arr[] = {9, 123 , 1, 4534, 66};
+    int arr[] = {9, 123 , 1, 4534, 66, 4, 0};
 
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < 7; i++)
         tree.insert(arr[i]);
     tree.print();
     return (0);
