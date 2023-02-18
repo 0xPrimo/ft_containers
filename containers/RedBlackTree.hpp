@@ -94,45 +94,95 @@ class RedBlackTree
             printBT(root);
         }
     private:
+        void rightRotation(node *Node)
+        {
+            node *tmp = Node->left;
+
+            // Inherite the Node
+            Node->left = tmp->right;
+            if (tmp->right != NULL)
+                tmp->right->parent = Node; // Inherite the Node
+            tmp->parent = Node->parent;
+            if (Node->parent == NULL)
+                root = tmp;
+            else if (Node == Node->parent->right) // the Node at the right side
+                Node->parent->right = tmp;
+            else // the Node at the left side
+                Node->parent->left = tmp;
+            tmp->right = Node;
+            Node->parent = tmp;
+        }
+
+        void leftRotation(node *Node)
+        {
+            node *tmp = Node->right;
+
+            Node->right = tmp->left;
+            if (tmp->left != NULL)
+                tmp->left->parent = Node;
+            tmp->parent = Node->parent;
+            if (Node->parent == NULL)
+                root = tmp;
+            else if (Node == Node->parent->left)
+                Node->parent->left = tmp;
+            else
+                Node->parent->right = tmp;
+            tmp->left = Node;
+            Node->parent = tmp;
+        }
+
         void BalanceTreeInsert(node *curr)
         {
-            while (curr != root && curr->color == RED && curr->parent->color == RED)
+            while (curr != root && curr->parent->color == RED)
             {
                 node *GrandNode = curr->parent->parent;
                 if (GrandNode->right == curr->parent) // we are at the right side of the tree
                 {
                     if (GrandNode->left->color == RED) // Swap colors
                     {
-                        GrandNode->color = BLACK;
+                        GrandNode->right->color = BLACK;
                         GrandNode->left->color = BLACK;
-                        GrandNode->parent->color = RED;
+                        GrandNode->color = RED;
 
                         curr = GrandNode; // balance the grand node
                     }
                     else // do a left rotation
                     {
-
+                        if (curr == curr->parent->left)
+                        {
+                            curr = curr->parent;
+                            rightRotation(curr);
+                        }
+                        curr->parent->color = BLACK;
+                        GrandNode->color = RED;
+                        leftRotation(GrandNode);
                     }
                 }
                 else // we are at the left side of the tree
                 {
-                    if (GrandNode->left->color == RED) // Swap colors
+                    if (GrandNode->right->color == RED) // Swap colors
                     {
-                        GrandNode->color = BLACK;
+                        GrandNode->left->color = BLACK;
                         GrandNode->right->color = BLACK;
-                        GrandNode->parent->color = RED;
+                        GrandNode->color = RED;
 
                         curr = GrandNode; // balance the grand node
                     }
                     else // do a right rotation
                     {
-
-
-
+                        if (curr == curr->parent->right)
+                        {
+                            curr = curr->parent;
+                            leftRotation(curr);
+                        }
+                        curr->parent->color = BLACK;
+                        GrandNode->color = RED;
+                        rightRotation(GrandNode);
                     }
                 }
                 
             }
+            root->color = BLACK;
         }
 
     public:

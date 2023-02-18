@@ -1,5 +1,5 @@
 CC = c++
-DFLAGS = -fsanitize=addresss -g
+DFLAGS = -fsanitize=address -g
 
 src = main.cpp
 
