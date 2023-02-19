@@ -1,8 +1,8 @@
-#include "containers/RedBlackTree.hpp"
+#include "containers/map.hpp"
 
 int main()
 {
-    RedBlackTree<int> tree;
+    map<int> tree;
     int arr[] = {9, 123 , 1, 4534, 66, 4, 0, 34, 948, 234, 987, 829, 950};
 
 

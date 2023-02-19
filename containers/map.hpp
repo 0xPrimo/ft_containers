@@ -21,7 +21,6 @@ struct Node
 {
     T       *value;
     int     color;
-    int     side;
     Node*   parent;
     Node*   left;
     Node*   right;
