@@ -28,7 +28,8 @@ struct Node
     Node(): value(0), color(RED), left(0), right(0), parent(0) {}
 
 };
-
+namespace ft
+{
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
 template< class T, class comp = std::less<T> , class alloc = std::allocator<T> >
 class map
@@ -45,7 +46,6 @@ class map
         typedef Node<T>                                                     node;
     private:
         node*           root;
-        node*           emptyNode;
         size_type       size;
         allocator_type  allocator;
     
@@ -102,7 +102,7 @@ class map
             if (tmp->right != NULL)
                 tmp->right->parent = Node; // Inherite the Node
             tmp->parent = Node->parent;
-            if (Node->parent == emptyNode)
+            if (Node->parent == NULL)
                 root = tmp;
             else if (Node == Node->parent->right) // the Node at the right side
                 Node->parent->right = tmp;
@@ -120,7 +120,7 @@ class map
             if (tmp->left != NULL)
                 tmp->left->parent = Node;
             tmp->parent = Node->parent;
-            if (Node->parent == emptyNode)
+            if (Node->parent == NULL)
                 root = tmp;
             else if (Node == Node->parent->left)
                 Node->parent->left = tmp;
@@ -159,7 +159,6 @@ class map
                 }
                 else // we are at the left side of the tree
                 {
-                    std::cout << GrandNode->right << std::endl;
                     if (GrandNode->right && GrandNode->right->color == RED) // Swap colors
                     {
                         GrandNode->left->color = BLACK;
@@ -186,16 +185,15 @@ class map
         }
 
     public:
-        map(): root(NULL), emptyNode(newNode(0, NULL)), size(0)
+        map(): root(NULL), size(0)
         {
-            emptyNode->color = BLACK;
         }
         
         void insert( value_type const &value)
         {
             if (!root && !size++)
             {
-                root = newNode(value, emptyNode);
+                root = newNode(value, NULL);
                 root->color = BLACK;
             }
             else
@@ -228,6 +226,86 @@ class map
 
         }
 
+        void rbTransplant(node *a, node *b)
+        {
+            if (a->parent == NULL)
+                root = b;
+            else if (a == a->parent->left)
+                a->parent->left = b;
+            else
+                a->parent->right = b;
+            if (b)
+                b->parent = a->parent;
+        }
+
+        node *get_min(node *node)
+        {
+            while (node->left != NULL)
+                node = node->left;
+            return (node);
+        }
+
+
+        node *get_node(value_type &value)
+        {
+            node *tmp = root;
+            while (tmp != NULL)
+            {
+                if (value < *(tmp->value))
+                    tmp = tmp->left;
+                else if (value > *(tmp->value))
+                    tmp = tmp->right;
+                else
+                    return (tmp);
+            }
+            return (0);
+        }
+
+        void erase(value_type &value)
+        {
+            erase(get_node(value));
+        }
+
+        void erase(node *Node)
+        {
+            node    *tmp = Node;
+            node    *to_balance;
+            int     color = Node->color;
+
+            if (Node->left == NULL)
+            {
+                to_balance = Node->right;
+                rbTransplant(Node, Node->right);
+            }
+            else if (Node->right == NULL)
+            {
+                to_balance = Node->left;
+                rbTransplant(Node, Node->left);
+            }
+            else
+            {
+                tmp = get_min(Node->right);
+                color = tmp->color;
+                to_balance = tmp->right;
+                if (to_balance && tmp->parent == Node)
+                    to_balance->parent = tmp;
+                else
+                {
+                    rbTransplant(tmp, tmp->right);
+                    tmp->right = Node->right;
+                    if (tmp->right)
+                        tmp->right->parent = tmp;
+                }
+
+                rbTransplant(Node, tmp);
+                tmp->left = Node->left;
+                tmp->left->parent = tmp;
+                tmp->color = Node->color;
+            }
+
+        }
+
 };
+}
 
 #endif
