@@ -184,6 +184,81 @@ class map
             root->color = BLACK;
         }
 
+        void changeColor(node *Node)
+        {
+            Node->color = Node->color == RED ? BLACK : RED;
+        }
+
+        void BalanceTreeErase(node *Node)
+        {
+            while(Node != root && Node->color != BLACK)
+            {
+                if (Node == Node->parent->left)
+                {
+                    node *sib = Node->parent->right;
+                    if (sib->color == RED)
+                    {
+                        sib->color = BLACK;
+                        Node->parent->color = RED;
+                        leftRotation(Node->parent);
+                        sib = Node->parent->right;
+                    }
+                    if (sib->left->color == BLACK && sib->right->color == BLACK)
+                    {
+                        sib->color = RED;
+                        Node = Node->parent;
+                    }
+                    else
+                    {
+                        if (sib->right->color == BLACK)
+                        {
+                            sib->left->color = BLACK;
+                            sib->color = RED;
+                            rightRotation(sib);
+                            sib = Node->parent->right;
+                        }
+                        sib->color = Node->parent->color;
+                        Node->parent->color = BLACK;
+                        sib->right->color = BLACK;
+                        leftRotation(Node->parent);
+                        Node = root;
+                    }
+                }
+                else
+                {
+                    node *sib = Node->parent->left;
+                    if (sib->color == RED)
+                    {
+                        sib->color = BLACK;
+                        Node->parent->color = RED;
+                        rightRotation(Node->parent);
+                        sib = Node->parent->left;
+                    }
+                    if (sib->left->color == BLACK && sib->right->color == BLACK)
+                    {
+                        sib->color = RED;
+                        Node = Node->parent;
+                    }
+                    else
+                    {
+                        if (sib->left->color == BLACK)
+                        {
+                            sib->right->color = BLACK;
+                            sib->color = RED;
+                            leftRotation(sib);
+                            sib = Node->parent->left;
+                        }
+                        sib->color = Node->parent->color;
+                        Node->parent->color = BLACK;
+                        sib->left->color = BLACK;
+                        rightRotation(Node->parent);
+                        Node = root;
+                    }                    
+                }
+            }
+            Node->color = BLACK;
+        }
+
     public:
         map(): root(NULL), size(0)
         {
