@@ -1,13 +1,13 @@
 #include "containers/map.hpp"
 #include "utils/pair.hpp"
-#include "fancy_tree/src/fancy_tree.hpp"
+#include "print_tree/src/fancy_tree.hpp"
 
 int main()
 {
-    const int arr[] = {9, 123 , 1, 4534, 66, 4, 0, 34, 948, 234, 987, 829, 950};
+    const int arr[] = {9, 123 , 1, 4534, 66, 4, 84, 34, 948, 234, 987, 829, 950};
     ft::map<int, int> map;
 
-    fancy_tree<ft::pair<const int, int>> tree;
+    fancy_tree<ft::pair<const int, int> > tree;
 
     for(int i = 0; i < 10; i++)
     {

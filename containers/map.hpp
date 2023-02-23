@@ -34,7 +34,7 @@ struct Node
 namespace ft
 {
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
-template< class T, class Key, class compare = std::less<Key> , class alloc = std::allocator<ft::pair<const Key, T>> >
+template< class T, class Key, class compare = std::less<Key> , class alloc = std::allocator<ft::pair<const Key, T> > >
 class map
 {
     public:
