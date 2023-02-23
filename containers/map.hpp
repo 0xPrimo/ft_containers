@@ -7,8 +7,7 @@
 
 # define RED 0
 # define BLACK 1
-# define LEFT 0
-# define RIGHT 1
+
 
 
 /* Colors */
@@ -44,8 +43,9 @@ class map
         typedef typename allocator_type::const_reference		            const_reference;
         typedef std::size_t										            size_type;
         typedef Node<T>                                                     node;
-    private:
+    public:
         node*           root;
+    private:
         node*           NIL;
         size_type       size;
         allocator_type  allocator;
@@ -115,6 +115,7 @@ class map
 
         void leftRotation(node *Node)
         {
+            printBT(Node);
             node *tmp = Node->right;
 
             Node->right = tmp->left;
@@ -126,7 +127,13 @@ class map
             else if (Node == Node->parent->left)
                 Node->parent->left = tmp;
             else
+            {
+                std::cout << "ayyeh" << std::endl;
+                std::cout << *Node->parent->value << std::endl;
+                std::cout << *Node->value << std::endl;
+                std::cout << *tmp->value << std::endl;
                 Node->parent->right = tmp;
+            }
             tmp->left = Node;
             Node->parent = tmp;
         }
@@ -221,15 +228,9 @@ class map
                             rightRotation(sib);
                             sib = Node->parent->right;
                         }
-                        if (Node->parent->parent == NIL)
-                            std::cout << "wall" << " " << *Node->parent->value << std::endl;
-                        else
-                            // std::cout << *(Node->parent->parent->value) << std::endl;
                         sib->color = Node->parent->color;
                         Node->parent->color = BLACK;
                         sib->right->color = BLACK;
-                        // std::cout << " yess" << std::endl;
-                        // printBT(root);
                         leftRotation(Node->parent);
                         Node = root;
                     }
@@ -273,7 +274,7 @@ class map
         {
             node *newnode = new node;
             
-            newnode->value = NULL;
+            newnode->value = new int(-1);
             newnode->color = BLACK;
             newnode->parent = NULL;
             newnode->left = NULL;
@@ -390,11 +391,11 @@ class map
                 {
                     rbTransplant(suc, suc->right);
                     suc->right = Node->right;
-                    suc->right->parent = Node;
+                    suc->right->parent = suc;
                 }
                 rbTransplant(Node, suc);
                 suc->left = Node->left;
-                suc->left->parent = Node;
+                suc->left->parent = suc;
                 suc->color = Node->color;
             }
             
