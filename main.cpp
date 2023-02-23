@@ -7,9 +7,11 @@ int main()
 
     for(int i = 0; i < 10; i++)
         map.insert(arr[i]);
+    map.print();
     
     map.erase(arr[0]);
-    map.erase(arr[1]);
+    map.print();
+    map.erase(arr[4]); 
     map.print();
     return (0);
 }

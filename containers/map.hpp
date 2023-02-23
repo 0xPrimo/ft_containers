@@ -46,6 +46,7 @@ class map
         typedef Node<T>                                                     node;
     private:
         node*           root;
+        node*           NIL;
         size_type       size;
         allocator_type  allocator;
     
@@ -58,22 +59,22 @@ class map
             allocator.construct(newnode->value, value);
             newnode->color = RED;
             newnode->parent = parent;
-            newnode->left = NULL;
-            newnode->right = NULL;
+            newnode->left = NIL;
+            newnode->right = NIL;
             return (newnode);
         }
 
     
         void printBT(const std::string& prefix, const node* node, bool isLeft)
         {
-            if( node != nullptr )
+            if( node != NIL )
             {
                 std::cout << prefix;
 
                 std::cout << (isLeft ? "├──" : "└──" );
 
                 // print the value of the node
-                std::cout << (node->color ? RESET: REED) << *node->value << RESET << std::endl;
+                std::cout << (node->color ? RESET: REED) << *node->value << RESET << (node->parent && node->parent->left == node ? "  Left": "  Right") << std::endl;
                 
                 
                 // enter the next tree level - left and right branch
@@ -99,10 +100,10 @@ class map
 
             // Inherite the Node
             Node->left = tmp->right;
-            if (tmp->right != NULL)
+            if (tmp->right != NIL)
                 tmp->right->parent = Node; // Inherite the Node
             tmp->parent = Node->parent;
-            if (Node->parent == NULL)
+            if (Node->parent == NIL)
                 root = tmp;
             else if (Node == Node->parent->right) // the Node at the right side
                 Node->parent->right = tmp;
@@ -117,10 +118,10 @@ class map
             node *tmp = Node->right;
 
             Node->right = tmp->left;
-            if (tmp->left != NULL)
+            if (tmp->left != NIL)
                 tmp->left->parent = Node;
             tmp->parent = Node->parent;
-            if (Node->parent == NULL)
+            if (Node->parent == NIL)
                 root = tmp;
             else if (Node == Node->parent->left)
                 Node->parent->left = tmp;
@@ -137,7 +138,7 @@ class map
                 node *GrandNode = curr->parent->parent;
                 if (GrandNode->right == curr->parent) // we are at the right side of the tree
                 {
-                    if (GrandNode->left && GrandNode->left->color == RED) // Swap colors
+                    if (GrandNode->left->color == RED) // Swap colors
                     {
                         GrandNode->right->color = BLACK;
                         GrandNode->left->color = BLACK;
@@ -159,7 +160,7 @@ class map
                 }
                 else // we are at the left side of the tree
                 {
-                    if (GrandNode->right && GrandNode->right->color == RED) // Swap colors
+                    if (GrandNode->right->color == RED) // Swap colors
                     {
                         GrandNode->left->color = BLACK;
                         GrandNode->right->color = BLACK;
@@ -191,10 +192,11 @@ class map
 
         void BalanceTreeErase(node *Node)
         {
-            while(Node != root && Node->color != BLACK)
+            while(Node != root && Node->color == BLACK)
             {
                 if (Node == Node->parent->left)
                 {
+                    // std::cout << ((Node == NIL) ? "true " : "false ") << *Node->parent->value << std::endl;
                     node *sib = Node->parent->right;
                     if (sib->color == RED)
                     {
@@ -203,8 +205,10 @@ class map
                         leftRotation(Node->parent);
                         sib = Node->parent->right;
                     }
+
                     if (sib->left->color == BLACK && sib->right->color == BLACK)
                     {
+
                         sib->color = RED;
                         Node = Node->parent;
                     }
@@ -217,9 +221,15 @@ class map
                             rightRotation(sib);
                             sib = Node->parent->right;
                         }
+                        if (Node->parent->parent == NIL)
+                            std::cout << "wall" << " " << *Node->parent->value << std::endl;
+                        else
+                            // std::cout << *(Node->parent->parent->value) << std::endl;
                         sib->color = Node->parent->color;
                         Node->parent->color = BLACK;
                         sib->right->color = BLACK;
+                        // std::cout << " yess" << std::endl;
+                        // printBT(root);
                         leftRotation(Node->parent);
                         Node = root;
                     }
@@ -259,8 +269,19 @@ class map
             Node->color = BLACK;
         }
 
+        node *newNIL()
+        {
+            node *newnode = new node;
+            
+            newnode->value = NULL;
+            newnode->color = BLACK;
+            newnode->parent = NULL;
+            newnode->left = NULL;
+            newnode->right = NULL;
+            return (newnode);      
+        }
     public:
-        map(): root(NULL), size(0)
+        map(): root(NULL), size(0), NIL(newNIL())
         {
         }
         
@@ -268,14 +289,14 @@ class map
         {
             if (!root && !size++)
             {
-                root = newNode(value, NULL);
+                root = newNode(value, NIL);
                 root->color = BLACK;
             }
             else
             {
                 node *tmp = root;
                 node *parent = NULL;
-                while (tmp != NULL)
+                while (tmp != NIL)
                 {
                     parent = tmp;
                     if (value < *(tmp->value))
@@ -303,19 +324,18 @@ class map
 
         void rbTransplant(node *a, node *b)
         {
-            if (a->parent == NULL)
+            if (a->parent == NIL)
                 root = b;
             else if (a == a->parent->left)
                 a->parent->left = b;
             else
                 a->parent->right = b;
-            if (b)
-                b->parent = a->parent;
+            b->parent = a->parent;
         }
 
         node *get_min(node *node)
         {
-            while (node->left != NULL)
+            while (node->left != NIL)
                 node = node->left;
             return (node);
         }
@@ -343,41 +363,43 @@ class map
 
         void erase(node *Node)
         {
-            node    *tmp = Node;
-            node    *to_balance;
-            int     color = Node->color;
 
-            if (Node->left == NULL)
+
+            node*   FixUp;
+            int     color;
+
+            color = Node->color;
+            if (Node->left == NIL)
             {
-                to_balance = Node->right;
+                FixUp = Node->right;
                 rbTransplant(Node, Node->right);
             }
-            else if (Node->right == NULL)
+            else if (Node->right == NIL)
             {
-                to_balance = Node->left;
+                FixUp = Node->left;
                 rbTransplant(Node, Node->left);
             }
             else
             {
-                tmp = get_min(Node->right);
-                color = tmp->color;
-                to_balance = tmp->right;
-                if (to_balance && tmp->parent == Node)
-                    to_balance->parent = tmp;
+                node *suc = get_min(Node->right);
+                color = suc->color;
+                FixUp = suc->right;
+                if (suc->parent == Node)
+                    suc->right->parent = suc;
                 else
                 {
-                    rbTransplant(tmp, tmp->right);
-                    tmp->right = Node->right;
-                    if (tmp->right)
-                        tmp->right->parent = tmp;
+                    rbTransplant(suc, suc->right);
+                    suc->right = Node->right;
+                    suc->right->parent = Node;
                 }
-
-                rbTransplant(Node, tmp);
-                tmp->left = Node->left;
-                tmp->left->parent = tmp;
-                tmp->color = Node->color;
+                rbTransplant(Node, suc);
+                suc->left = Node->left;
+                suc->left->parent = Node;
+                suc->color = Node->color;
             }
-
+            
+            if (color == BLACK)
+                BalanceTreeErase(FixUp);
         }
 
 };
