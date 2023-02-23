@@ -3,7 +3,8 @@
 # include <memory>
 # include <string>
 # include <iostream>
-// # include "../utils/pair.hpp"
+
+# include "../utils/pair.hpp"
 
 # define RED 0
 # define BLACK 1
@@ -18,45 +19,53 @@
 template< class T>
 struct Node
 {
-    T       *value;
+    typedef T   value_type;
+
+    T       value;
     int     color;
     Node*   parent;
     Node*   left;
     Node*   right;
 
-    Node(): value(0), color(RED), left(0), right(0), parent(0) {}
+    Node(): color(RED), left(0), right(0), parent(0) {}
+    // Node(const Node &other): value(other.value), color(other.color), left(other.left), right(other.right), parent(other.parent) {}
 
 };
 namespace ft
 {
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
-template< class T, class comp = std::less<T> , class alloc = std::allocator<T> >
+template< class T, class Key, class compare = std::less<Key> , class alloc = std::allocator<ft::pair<const Key, T>> >
 class map
 {
     public:
-        typedef T												            value_type;
-        typedef alloc   										            allocator_type;                // container allocator
-        typedef comp                                                        value_compare;                     
-        typedef typename allocator_type::pointer				            pointer;
-        typedef typename allocator_type::const_pointer			            const_pointer;
-        typedef typename allocator_type::reference				            reference;
-        typedef typename allocator_type::const_reference		            const_reference;
-        typedef std::size_t										            size_type;
-        typedef Node<T>                                                     node;
-    public:
-        node*           root;
+        typedef Key                                             key_type;
+        typedef T                                               mapped_type;
+        typedef ft::pair<const Key, T>		                    value_type;
+        typedef std::size_t                                     size_type;
+        typedef std::ptrdiff_t                                  difference_type;
+        typedef compare                                         Key_compare;
+        typedef alloc                                           allocator_type;
+        typedef typename allocator_type::reference              reference;
+        typedef typename allocator_type::const_reference        const_reference;
+        typedef typename allocator_type::pointer                pointer;
+        typedef typename allocator_type::const_pointer          const_pointer;
+        typedef Node<value_type>                                node;
+        typedef typename alloc::template rebind<node>::other    node_allocator;
+
+        node*                   root;
     private:
-        node*           NIL;
-        size_type       size;
-        allocator_type  allocator;
+        node*                   NIL;
+        size_type               size;
+        allocator_type          allocator;
+        node_allocator          nodeAlloc;
+        Key_compare             key_compare;
     
     private:
         node *newNode(value_type const &value, node *parent)
         {
-            node *newnode = new node;
+            node *newnode = nodeAlloc.allocate(1);
             
-            newnode->value = allocator.allocate(1);
-            allocator.construct(newnode->value, value);
+            allocator.construct(&newnode->value, value);
             newnode->color = RED;
             newnode->parent = parent;
             newnode->left = NIL;
@@ -64,36 +73,17 @@ class map
             return (newnode);
         }
 
-    
-        void printBT(const std::string& prefix, const node* node, bool isLeft)
+        node *newNIL()
         {
-            if( node != NIL )
-            {
-                std::cout << prefix;
+            node *newnode = nodeAlloc.allocate(1);
 
-                std::cout << (isLeft ? "├──" : "└──" );
-
-                // print the value of the node
-                std::cout << (node->color ? RESET: REED) << *node->value << RESET << (node->parent && node->parent->left == node ? "  Left": "  Right") << std::endl;
-                
-                
-                // enter the next tree level - left and right branch
-                printBT( prefix + (isLeft ? "│   " : "    "), node->left, true);
-                printBT( prefix + (isLeft ? "│   " : "    "), node->right, false);
-            }
+            newnode->color = BLACK;
+            newnode->parent = NULL;
+            newnode->left = NULL;
+            newnode->right = NULL;
+            return (newnode);      
         }
 
-        void printBT(const node* node)
-        {
-            printBT("", node, false);
-        }
-
-    public:
-        void print()
-        {
-            printBT(root);
-        }
-    private:
         void rightRotation(node *Node)
         {
             node *tmp = Node->left;
@@ -115,7 +105,6 @@ class map
 
         void leftRotation(node *Node)
         {
-            printBT(Node);
             node *tmp = Node->right;
 
             Node->right = tmp->left;
@@ -127,13 +116,7 @@ class map
             else if (Node == Node->parent->left)
                 Node->parent->left = tmp;
             else
-            {
-                std::cout << "ayyeh" << std::endl;
-                std::cout << *Node->parent->value << std::endl;
-                std::cout << *Node->value << std::endl;
-                std::cout << *tmp->value << std::endl;
                 Node->parent->right = tmp;
-            }
             tmp->left = Node;
             Node->parent = tmp;
         }
@@ -192,18 +175,12 @@ class map
             root->color = BLACK;
         }
 
-        void changeColor(node *Node)
-        {
-            Node->color = Node->color == RED ? BLACK : RED;
-        }
-
         void BalanceTreeErase(node *Node)
         {
             while(Node != root && Node->color == BLACK)
             {
                 if (Node == Node->parent->left)
                 {
-                    // std::cout << ((Node == NIL) ? "true " : "false ") << *Node->parent->value << std::endl;
                     node *sib = Node->parent->right;
                     if (sib->color == RED)
                     {
@@ -270,59 +247,6 @@ class map
             Node->color = BLACK;
         }
 
-        node *newNIL()
-        {
-            node *newnode = new node;
-            
-            newnode->value = new int(-1);
-            newnode->color = BLACK;
-            newnode->parent = NULL;
-            newnode->left = NULL;
-            newnode->right = NULL;
-            return (newnode);      
-        }
-    public:
-        map(): root(NULL), size(0), NIL(newNIL())
-        {
-        }
-        
-        void insert( value_type const &value)
-        {
-            if (!root && !size++)
-            {
-                root = newNode(value, NIL);
-                root->color = BLACK;
-            }
-            else
-            {
-                node *tmp = root;
-                node *parent = NULL;
-                while (tmp != NIL)
-                {
-                    parent = tmp;
-                    if (value < *(tmp->value))
-                        tmp = tmp->left;
-                    else if (*(tmp->value) < value)
-                        tmp = tmp->right;
-                }
-                if (value < *parent->value)
-                {   
-                    parent->left = newNode(value, parent);
-                    if (parent->color == RED)
-                        BalanceTreeInsert(parent->left);
-                }
-                else
-                {
-                    parent->right = newNode(value, parent);
-                    if (parent->color == RED)
-                        BalanceTreeInsert(parent->right);
-                }
-            }
-            size++;
-            /* balance the tree */
-
-        }
-
         void rbTransplant(node *a, node *b)
         {
             if (a->parent == NIL)
@@ -347,14 +271,56 @@ class map
             node *tmp = root;
             while (tmp != NULL)
             {
-                if (value < *(tmp->value))
+                if (key_compare(value.first, tmp->value.first))
                     tmp = tmp->left;
-                else if (value > *(tmp->value))
+                else if (!key_compare(value.first, tmp->value.first))
                     tmp = tmp->right;
                 else
                     return (tmp);
             }
             return (0);
+        }
+
+    public:
+        map(): root(NULL), size(0), NIL(newNIL())
+        {
+        }
+        
+        void insert( const value_type &value)
+        {
+            if (!root && !size++)
+            {
+                root = newNode(value, NIL);
+                root->color = BLACK;
+            }
+            else
+            {
+                node *tmp = root;
+                node *parent = NULL;
+                while (tmp != NIL)
+                {
+                    parent = tmp;
+                    if (key_compare(value.first, tmp->value.first))
+                        tmp = tmp->left;
+                    else if (key_compare(tmp->value.first, value.first))
+                        tmp = tmp->right;
+                }
+                if (key_compare(value.first, parent->value.first))
+                {   
+                    parent->left = newNode(value, parent);
+                    if (parent->color == RED)
+                        BalanceTreeInsert(parent->left);
+                }
+                else
+                {
+                    parent->right = newNode(value, parent);
+                    if (parent->color == RED)
+                        BalanceTreeInsert(parent->right);
+                }
+            }
+            size++;
+            /* balance the tree */
+
         }
 
         void erase(value_type &value)
@@ -364,8 +330,6 @@ class map
 
         void erase(node *Node)
         {
-
-
             node*   FixUp;
             int     color;
 
@@ -401,6 +365,7 @@ class map
             
             if (color == BLACK)
                 BalanceTreeErase(FixUp);
+            size--;
         }
 
 };
