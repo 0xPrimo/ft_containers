@@ -5,9 +5,8 @@
 # include <iostream>
 
 # include "../utils/pair.hpp"
+# include "map_iterator.hpp"
 
-# define RED 0
-# define BLACK 1
 
 
 
@@ -16,21 +15,7 @@
 #define REED   "\033[0;31m"
 
 
-template< class T>
-struct Node
-{
-    typedef T   value_type;
 
-    T       value;
-    int     color;
-    Node*   parent;
-    Node*   left;
-    Node*   right;
-
-    Node(): color(RED), left(0), right(0), parent(0) {}
-    // Node(const Node &other): value(other.value), color(other.color), left(other.left), right(other.right), parent(other.parent) {}
-
-};
 namespace ft
 {
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
@@ -51,9 +36,11 @@ class map
         typedef typename allocator_type::const_pointer          const_pointer;
         typedef Node<value_type>                                node;
         typedef typename alloc::template rebind<node>::other    node_allocator;
+        typedef ft::map_iterator<value_type*>                   iterator;
+        typedef ft::map_iterator<const value_type*>             const_iterator;
 
-        node*                   root;
     private:
+        node*                   root;
         node*                   NIL;
         size_type               size;
         allocator_type          allocator;
@@ -282,18 +269,25 @@ class map
         }
 
     public:
+        map():root(NULL), size(0), NIL(newNIL()) {}
         map(const compare &com,
-            const allocator_type &alloc = allocator_type()): root(NULL), size(0), NIL(newNIL()),
-                                                             allocator(alloc), key_compare(com)
+            const allocator_type &allocator = allocator_type()): root(NULL), size(0), NIL(newNIL()),
+                                                             allocator(allocator), compare(com)
         {
         }
         
-        template<class InputIt>
-        map( InputIt first, InputIt last,
-            const compare &comp = compare(),
-            const allocator_type &alloc = allocator_type())
+        // template<class InputIt>
+        // map( InputIt first, InputIt last,
+        //     const compare &comp = compare(),
+        //     const allocator_type &allocator = allocator_type())
+        // {
+            // while (first != last)
+            //     insert()   
+        // }
+
+        iterator begin()
         {
-            
+            return (iterator(get_min(root), NIL));
         }
         void insert( const value_type &value)
         {

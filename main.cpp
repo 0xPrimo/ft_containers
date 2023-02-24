@@ -1,32 +1,38 @@
 #include "containers/map.hpp"
 #include "utils/pair.hpp"
-#include "p_tree/src/fancy_tree.hpp"
+// #include "p_tree/src/fancy_tree.hpp"
+#include "containers/map_iterator.hpp"
+#include <map>
+#include <utility>
+#include <string>
+
 
 int main()
 {
-    const int arr[] = {9, 123 , 1, 4534, 66, 4, 84, 34, 948, 234, 987, 829, 950};
-    ft::map<int, int> map;
+    ft::map<std::string, int> db;
+    std::string str1 = "empty", str2 = "full", str3 = "yello", str4 = "mello";
+    int num1 = 1, num2 = 2, num3 = 3, num4 = 4;
 
-    fancy_tree<ft::pair<const int, int> > tree;
+    ft::pair<const int, std::string> p1(1, "hello");
+    ft::pair<const int, std::string> p2(2, "hello");
+    ft::pair<const int, std::string> p3(3, "hello");
+    ft::pair<const int, std::string> p4(4, "hello");
 
-    for(int i = 0; i < 10; i++)
-    {
-        ft::pair<const int, int> p(arr[i], -1);
-        map.insert(p);
-    }
-    // // map.print();
+    // ft::pair<const int, std::string> p(1, "empty");
+    db.insert(p1);
+    db.insert(p2);
+    db.insert(p3);
+    db.insert(p4);
+
+    ft::map<std::string, int>::iterator it = db.begin();
+    it++;
     
-    // map.erase(arr[0]);
-    // // std::cout << *map.root->value << std::endl;
-    // map.erase(arr[4]); 
-    // map.erase(arr[8]); 
-    // map.erase(arr[2]); 
-    // map.erase(arr[9]); 
-    // map.erase(arr[3]); 
-    tree.print_tree(map.root, V_VIEW);
-    // map.print();
-    // map.print();
-
+    // db.insert(std::make_pair(num2, str2));
+    // db.insert(std::make_pair(num3, str3));
+    // db.insert(std::make_pair(num4, str4));
+    
+    // std::cout << (--db.begin())->first << std::endl;
+    // map_iterator<int *> it;
 
     return (0);
 }
