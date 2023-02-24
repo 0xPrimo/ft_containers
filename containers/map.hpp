@@ -282,10 +282,19 @@ class map
         }
 
     public:
-        map(): root(NULL), size(0), NIL(newNIL())
+        map(const compare &com,
+            const allocator_type &alloc = allocator_type()): root(NULL), size(0), NIL(newNIL()),
+                                                             allocator(alloc), key_compare(com)
         {
         }
         
+        template<class InputIt>
+        map( InputIt first, InputIt last,
+            const compare &comp = compare(),
+            const allocator_type &alloc = allocator_type())
+        {
+            
+        }
         void insert( const value_type &value)
         {
             if (!root && !size++)

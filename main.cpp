@@ -1,6 +1,6 @@
 #include "containers/map.hpp"
 #include "utils/pair.hpp"
-#include "print_tree/src/fancy_tree.hpp"
+#include "p_tree/src/fancy_tree.hpp"
 
 int main()
 {
