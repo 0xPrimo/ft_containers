@@ -20,6 +20,7 @@ void vec_test_erase()
         intvector v(b_int, b_int + b_size - 5);
 
         intvector::iterator it = v.erase(v.begin() + 26);
+
         PRINT_LINE("It:", *it);
         CHECK_AND_PRINT_ALL(v);
 

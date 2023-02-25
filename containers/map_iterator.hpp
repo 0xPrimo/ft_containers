@@ -59,7 +59,7 @@ namespace ft
             
             
 
-            map_iterator& operator++(int)
+            map_iterator& operator++()
             {
                 if (node->right != NIL)
                 {
@@ -80,26 +80,42 @@ namespace ft
                 return (*this);
             }
 
-            // map_iterator& operator--()
-            // {
-            //     if (node->NIL != NIL)
-            //     {
-            //         node = node->left;
-            //         while (node->right != NIL)
-            //             node = node->right;
-            //     }
-            //     else
-            //     {
-            //         Node *parent = node->parent;
-            //         while (parent != NIL && node == node->left)
-            //         {
-            //             node = parent;
-            //             parent = parent->parent;
-            //         }
-            //         node = parent;
-            //     }
-            //     return (*this);
-            // }
+            map_iterator operator++(int)
+            {
+                map_iterator tmp(*this);
+                this->operator++();
+                return (tmp);
+            }
+            map_iterator& operator--()
+            {
+                if (node->NIL != NIL)
+                {
+                    node = node->left;
+                    while (node->right != NIL)
+                        node = node->right;
+                }
+                else
+                {
+                    Node *parent = node->parent;
+                    while (parent != NIL && node == node->left)
+                    {
+                        node = parent;
+                        parent = parent->parent;
+                    }
+                    node = parent;
+                }
+                return (*this);
+            }
+
+            reference operator*() const
+            {
+                return (node->value);
+            }
+
+            pointer operator->() const
+            {
+                return (&node->value);
+            }
 
             Node* base() const
             {
@@ -114,5 +130,74 @@ namespace ft
             Node*   node;
             Node*   NIL;
     };
+
+    // template <class it>
+    // Iterator<it> operator-(int n, const Iterator<it> &other)
+    // {
+    //     Iterator<it> tmp(other);
+
+    //     tmp -= n;
+
+    //     return (tmp);
+    // }
+
+    // template <class it>
+    // Iterator<it> operator+(int n, const Iterator<it> &other)
+    // {
+    //     Iterator<it> tmp(other);
+
+    //     tmp += n;
+
+    //     return (tmp);
+    // }
+
+    template <class it1, class it2>
+    bool operator==(const ft::map_iterator<it1> &iter1, const ft::map_iterator<it2> &iter2)
+    {
+        if (iter1.base() == iter2.base())
+            return (true);
+        return (false);
+    }
+
+    template <class it1, class it2>
+    bool operator!=(const ft::map_iterator<it1> &iter1, const ft::map_iterator<it2> &iter2)
+    {
+        if (iter1.base() != iter2.base())
+            return (true);
+        return (false);
+    }
+
+    // template <class it1, class it2>
+    // bool operator<(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    // {
+    //     if (iter1.base() < iter2.base())
+    //         return (true);
+    //     return (false);
+    // }
+
+    // template <class it1, class it2>
+    // bool operator<=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    // {
+    //     if (iter1.base() <= iter2.base())
+    //         return (true);
+    //     return (false);
+    // }
+
+    // template <class it1, class it2>
+    // bool operator>(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    // {
+    //     if (iter1.base() > iter2.base())
+    //         return (true);
+    //     return (false);
+    // }
+
+    // template <class it1, class it2>
+    // bool operator>=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
+    // {
+    //     if (iter1.base() >= iter2.base())
+    //         return (true);
+    //     return (false);
+    // }
+
 }
 #endif

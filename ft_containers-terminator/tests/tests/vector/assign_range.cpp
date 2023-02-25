@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "vector_prelude.hpp"
-#include <unistd.h>
 
 void vec_test_assign_range()
 {
@@ -19,6 +18,7 @@ void vec_test_assign_range()
 
     {
         strvector v;
+
         CHECK_AND_PRINT_ALL(v);
 
         v.assign(b_string, b_string + b_size);
@@ -85,8 +85,8 @@ void vec_test_assign_range()
         CHECK_AND_PRINT_ALL(v);
 
         v.assign(it, end);
+
         CHECK_AND_PRINT_ALL(v);
-        
     }
 }
 

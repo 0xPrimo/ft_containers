@@ -24,7 +24,7 @@ void map_test_assignment()
 
         PRINT_ALL(m1);
 
-        // m2 = intmap(intstr_arr, intstr_arr + intstr_size);
+        m2 = intmap(intstr_arr, intstr_arr + intstr_size);
 
         // PRINT_ALL(m2);
 

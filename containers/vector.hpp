@@ -315,8 +315,6 @@ class vector
         /* Returns the maximum possible number of elements */
         size_type max_size() const
         {
-            if (sizeof(value_type) == 1)
-                return(pow(2.0, 64.0));
             return (m_Allocator.max_size());
         }
 

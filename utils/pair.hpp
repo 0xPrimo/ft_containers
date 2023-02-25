@@ -30,8 +30,6 @@ namespace ft
 
         pair &operator=(const pair &other)
         {
-            if (*this == other)
-                return (*this);
             first = other.first;
             second = other.second;
             return (*this);

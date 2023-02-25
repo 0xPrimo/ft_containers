@@ -6,7 +6,7 @@
 
 # include "../utils/pair.hpp"
 # include "map_iterator.hpp"
-
+# include "vector_reverse_iterator.hpp"
 
 
 
@@ -19,7 +19,7 @@
 namespace ft
 {
 /* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
-template< class T, class Key, class compare = std::less<Key> , class alloc = std::allocator<ft::pair<const Key, T> > >
+template< class Key, class T, class compare = std::less<Key> , class alloc = std::allocator<ft::pair<const Key, T> > >
 class map
 {
     public:
@@ -38,11 +38,13 @@ class map
         typedef typename alloc::template rebind<node>::other    node_allocator;
         typedef ft::map_iterator<value_type*>                   iterator;
         typedef ft::map_iterator<const value_type*>             const_iterator;
+        typedef ft::reverse_iterator<iterator>                  reverse_iterator;
+        typedef ft::reverse_iterator<const_iterator>            const_reverse_iterator;
 
     private:
         node*                   root;
         node*                   NIL;
-        size_type               size;
+        size_type               Size;
         allocator_type          allocator;
         node_allocator          nodeAlloc;
         Key_compare             key_compare;
@@ -245,13 +247,23 @@ class map
             b->parent = a->parent;
         }
 
-        node *get_min(node *node)
+        node *get_min(node *node) const
         {
+            if (!node)
+                return (NULL);
             while (node->left != NIL)
                 node = node->left;
             return (node);
         }
-
+        
+        node *get_max(node *node) const
+        {
+            if (!node)
+                return (NULL);
+            while (node->right != NIL)
+                node = node->right;
+            return (node);
+        }
 
         node *get_node(value_type &value)
         {
@@ -268,30 +280,106 @@ class map
             return (0);
         }
 
+        void delete_tree(node *Node)
+        {
+            if (!Node || Node == NIL)
+                return ;
+            delete_tree(Node->left);
+            delete_tree(Node->right);
+            allocator.destroy(&Node->value);
+            nodeAlloc.deallocate(Node, 1);
+        }
+
     public:
-        map():root(NULL), size(0), NIL(newNIL()) {}
-        map(const compare &com,
-            const allocator_type &allocator = allocator_type()): root(NULL), size(0), NIL(newNIL()),
-                                                             allocator(allocator), compare(com)
+
+        ////////////////////////////////////////////////////////////////////
+        //                        Member functions                        //
+        ////////////////////////////////////////////////////////////////////
+
+        map():root(NULL), NIL(newNIL()), Size(0)
+        {
+        }
+
+        map(const compare &comp, const allocator_type &allocator = allocator_type()):    root(NULL),
+                                                                                        Size(0),
+                                                                                        NIL(newNIL()),
+                                                                                        allocator(allocator),
+                                                                                        key_compare(comp)
         {
         }
         
-        // template<class InputIt>
-        // map( InputIt first, InputIt last,
-        //     const compare &comp = compare(),
-        //     const allocator_type &allocator = allocator_type())
-        // {
-            // while (first != last)
-            //     insert()   
-        // }
+        template<class InputIt>
+        map( InputIt first, InputIt last,
+            const compare &comp = compare(),
+            const allocator_type &allocator = allocator_type()):    allocator(allocator),
+                                                                    key_compare(comp)
+        {
+            insert(first, last);
+        }
 
-        iterator begin()
+        map(const map &other)
+        {
+            const_iterator it = other.begin();
+            for(; it != other.end();it++)
+                insert(*it);
+        }
+
+        map& operator=(const map &other)
+        {
+            Size = 0;
+            iterator it = other.begin();
+            for(; it != other.end(); it++)
+                insert(*it);
+            return (*this);
+        }
+        
+        ~map()
+        {
+            // delete_tree(root);
+                // allocator.destroy(&NIL->value);
+                // nodeAlloc.deallocate(NIL, 1);
+            // std::cout << NIL->value << std::endl;
+            // nodeAlloc.deallocate(NIL, 1);
+            clear();
+        }
+        ////////////////////////////////////////////////////////////////////
+        //                          Element access                        //
+        ////////////////////////////////////////////////////////////////////
+        /**/
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Iterators                           //
+        ////////////////////////////////////////////////////////////////////
+        /**/
+        iterator begin() const
         {
             return (iterator(get_min(root), NIL));
         }
+
+        iterator end() const
+        {
+            return (iterator(get_max(root), NIL));
+        }
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Capacity                            //
+        ////////////////////////////////////////////////////////////////////
+        size_type size() const
+        {
+            return (Size);
+        }
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Modifiers                           //
+        ////////////////////////////////////////////////////////////////////
+        void clear()
+        {
+            delete_tree(root);
+        }
+        
         void insert( const value_type &value)
         {
-            if (!root && !size++)
+            if (!root && !Size++)
             {
                 root = newNode(value, NIL);
                 root->color = BLACK;
@@ -321,9 +409,16 @@ class map
                         BalanceTreeInsert(parent->right);
                 }
             }
-            size++;
+            Size++;
             /* balance the tree */
 
+        }
+
+        template <class it>
+        void insert(it first, it last)
+        {
+            for(; first != last; first++)
+                insert(*first);
         }
 
         void erase(value_type &value)
@@ -368,10 +463,12 @@ class map
             
             if (color == BLACK)
                 BalanceTreeErase(FixUp);
-            size--;
+            Size--;
         }
-
 };
+        ////////////////////////////////////////////////////////////////////
+        //                        Non-member functions                    //
+        ////////////////////////////////////////////////////////////////////
 }
 
 #endif

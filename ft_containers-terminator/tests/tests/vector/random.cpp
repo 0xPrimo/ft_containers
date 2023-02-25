@@ -57,63 +57,63 @@ void vec_test_random()
             PRINT_MSG(*crit);
         }
 
-        // it = v.insert(v.begin(), "ABCD");
+        it = v.insert(v.begin(), "ABCD");
 
-        // PRINT_MSG(*it);
+        PRINT_MSG(*it);
 
-        // PRINT_MSG(v.back());
-        // PRINT_MSG(v.front());
+        PRINT_MSG(v.back());
+        PRINT_MSG(v.front());
 
-        // PRINT_LINE("Empty:", (v.empty() ? "true" : "false"));
+        PRINT_LINE("Empty:", (v.empty() ? "true" : "false"));
 
-        // v.clear();
+        v.clear();
 
-        // PRINT_LINE("Empty:", (v.empty() ? "true" : "false"));
+        PRINT_LINE("Empty:", (v.empty() ? "true" : "false"));
 
-        // CHECK_AND_PRINT_ALL(v);
+        CHECK_AND_PRINT_ALL(v);
 
-        // v.resize(70, "Cool string");
+        v.resize(70, "Cool string");
 
-        // CHECK_AND_PRINT_ALL(v);
+        CHECK_AND_PRINT_ALL(v);
 
-        // v.assign(22, "64");
+        v.assign(22, "64");
 
-        // CHECK_AND_PRINT_ALL(v);
+        CHECK_AND_PRINT_ALL(v);
 
-        // v.assign(b_string, b_string + 8);
+        v.assign(b_string, b_string + 8);
 
-        // CHECK_AND_PRINT_ALL(v);
+        CHECK_AND_PRINT_ALL(v);
 
-        // strvector v2;
+        strvector v2;
 
-        // if (v2 < v) {
-        //     PRINT_MSG("Small");
-        // }
+        if (v2 < v) {
+            PRINT_MSG("Small");
+        }
 
-        // v2 = v;
+        v2 = v;
 
-        // if (v2 == v) {
-        //     PRINT_MSG("Equal");
-        // }
+        if (v2 == v) {
+            PRINT_MSG("Equal");
+        }
 
-        // if (v2 <= v) {
-        //     PRINT_MSG("Le");
-        // }
+        if (v2 <= v) {
+            PRINT_MSG("Le");
+        }
 
-        // v2.reserve(64);
+        v2.reserve(64);
 
-        // try {
-        //     PRINT_LINE("At:", v2.at(26));
-        // } catch (std::out_of_range& e) {
-        //     PRINT_LINE("Out of range:", 26);
-        // }
-        // CATCH_UNHANDLED_EX();
+        try {
+            PRINT_LINE("At:", v2.at(26));
+        } catch (std::out_of_range& e) {
+            PRINT_LINE("Out of range:", 26);
+        }
+        CATCH_UNHANDLED_EX();
 
-        // CHECK_AND_PRINT_ALL(v2);
+        CHECK_AND_PRINT_ALL(v2);
 
-        // v.erase(v.begin() + 4, v.end());
+        v.erase(v.begin() + 4, v.end());
 
-        // CHECK_AND_PRINT_ALL(v);
+        CHECK_AND_PRINT_ALL(v);
     }
 }
 
