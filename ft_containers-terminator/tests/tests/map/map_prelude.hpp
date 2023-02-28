@@ -83,6 +83,7 @@ void init_array_int_str(NAMESPACE::pair<int, std::string>* arr, std::size_t size
     for (std::size_t i = 0; i < size; ++i) {
         arr[i] = NAMESPACE::make_pair(rand(), x[i]);
     }
+
 }
 
 template <typename T>

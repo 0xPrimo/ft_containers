@@ -6,7 +6,7 @@
 #include <cmath>
 
 //header file that contains Node definition
-// #include "../../containers/map.hpp"
+#include "../../containers/map_iterator.hpp"
 
 
 # define RED 0
@@ -27,7 +27,7 @@
 #define LEFT left				// left attribute
 #define RIGHT right			// right attribute
 #define PARENT parent			// parent attribute (can be ignnored)
-#define CONTENT value.first			// data attribute + element of pair(if exists)
+#define CONTENT value.first		// data attribute + element of pair(if exists)
 
 /*===========================================*/
 

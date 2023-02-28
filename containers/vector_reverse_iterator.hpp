@@ -118,7 +118,7 @@ namespace ft
             }
 
         private:
-            iterator_type m_Iterator;
+            iter m_Iterator;
 
     };
 

@@ -11,7 +11,7 @@ LOGS="logs"
 DIFFS="diffs"
 
 CXX="clang++"
-CXXFLAGS="-Wall -Werror -Wextra -std=c++98 -I$FT_CONTAINERS -I."
+CXXFLAGS="-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g -I$FT_CONTAINERS -I."
 
 TEST_DIR="tests"
 

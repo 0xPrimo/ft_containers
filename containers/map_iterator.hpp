@@ -17,7 +17,6 @@ struct Node
     Node*   right;
 
     Node(): color(RED), left(0), right(0), parent(0) {}
-    // Node(const Node &other): value(other.value), color(other.color), left(other.left), right(other.right), parent(other.parent) {}
 
 };
 namespace ft
@@ -30,30 +29,38 @@ namespace ft
             typedef typename ft::iterator_traits<value>::difference_type             difference_type;
             typedef typename ft::iterator_traits<value>::pointer                     pointer;
             typedef typename ft::iterator_traits<value>::reference                   reference;
-            typedef typename ft::iterator_traits<value>::iterator_category           iterator_category;
+            typedef std::bidirectional_iterator_tag                                  iterator_category;
             typedef Node<value_type>                                                 Node;
 
-
+        private:
+            Node *get_max(Node *node)
+            {
+                if (!node || node == NIL)
+                    return (NULL);
+                while (node->right != NIL)
+                    node = node->right;
+                return (node);
+            }
 
         public:
-            map_iterator(): node(NULL), NIL(NULL)
+            map_iterator(): node(NULL), NIL(NULL), Max(NULL)
             {
-
             }
 
-            map_iterator(Node* node, Node* NIL): node(node), NIL(NIL)
+            map_iterator(Node* node, Node* NIL, Node *Max): node(node), NIL(NIL), Max(Max)
             {
-
             }
-            map_iterator(const map_iterator& other): node(other.base()), NIL(other.Nil())
+            
+            template<class U>
+            map_iterator(const map_iterator<U>& other): node(other.base()), NIL(other.Nil()), Max(other.max())
             {
-
             }
 
             map_iterator& operator=(const map_iterator& other)
             {
                 this->node = other.base();
                 this->NIL = other.Nil();
+                this->Max = other.max();
                 return (*this);
             }
             
@@ -70,7 +77,7 @@ namespace ft
                 else
                 {
                     Node *parent = node->parent;
-                    while (parent != NIL && node == node->right)
+                    while (parent != NIL && node == parent->right)
                     {
                         node = parent;
                         parent = parent->parent;
@@ -86,9 +93,12 @@ namespace ft
                 this->operator++();
                 return (tmp);
             }
+
             map_iterator& operator--()
             {
-                if (node->NIL != NIL)
+                if (node == NIL)
+                    node = Max;
+                else if (node->left != NIL)
                 {
                     node = node->left;
                     while (node->right != NIL)
@@ -97,7 +107,7 @@ namespace ft
                 else
                 {
                     Node *parent = node->parent;
-                    while (parent != NIL && node == node->left)
+                    while (parent != NIL && node == parent->left)
                     {
                         node = parent;
                         parent = parent->parent;
@@ -107,6 +117,12 @@ namespace ft
                 return (*this);
             }
 
+            map_iterator operator--(int)
+            {
+                map_iterator tmp(*this);
+                this->operator--();
+                return (tmp);
+            }
             reference operator*() const
             {
                 return (node->value);
@@ -126,30 +142,15 @@ namespace ft
                 return (NIL);
             }
 
+            Node* max() const
+            {
+                return (Max);
+            }
         private:
             Node*   node;
             Node*   NIL;
+            Node*   Max;
     };
-
-    // template <class it>
-    // Iterator<it> operator-(int n, const Iterator<it> &other)
-    // {
-    //     Iterator<it> tmp(other);
-
-    //     tmp -= n;
-
-    //     return (tmp);
-    // }
-
-    // template <class it>
-    // Iterator<it> operator+(int n, const Iterator<it> &other)
-    // {
-    //     Iterator<it> tmp(other);
-
-    //     tmp += n;
-
-    //     return (tmp);
-    // }
 
     template <class it1, class it2>
     bool operator==(const ft::map_iterator<it1> &iter1, const ft::map_iterator<it2> &iter2)
@@ -166,38 +167,5 @@ namespace ft
             return (true);
         return (false);
     }
-
-    // template <class it1, class it2>
-    // bool operator<(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
-    // {
-    //     if (iter1.base() < iter2.base())
-    //         return (true);
-    //     return (false);
-    // }
-
-    // template <class it1, class it2>
-    // bool operator<=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
-    // {
-    //     if (iter1.base() <= iter2.base())
-    //         return (true);
-    //     return (false);
-    // }
-
-    // template <class it1, class it2>
-    // bool operator>(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
-    // {
-    //     if (iter1.base() > iter2.base())
-    //         return (true);
-    //     return (false);
-    // }
-
-    // template <class it1, class it2>
-    // bool operator>=(const ft::Iterator<it1> &iter1, const ft::Iterator<it2> &iter2)
-    // {
-    //     if (iter1.base() >= iter2.base())
-    //         return (true);
-    //     return (false);
-    // }
-
 }
 #endif
