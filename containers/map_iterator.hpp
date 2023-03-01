@@ -1,7 +1,7 @@
 #ifndef _MAP_ITERATOR_
 # define _MAP_ITERATOR_
 
-#include "vector_iterator_traits.hpp"
+#include "../utils/iterator_traits.hpp"
 
 # define RED 0
 # define BLACK 1

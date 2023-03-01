@@ -6,19 +6,12 @@
 # include <unistd.h>
 # include "../utils/pair.hpp"
 # include "map_iterator.hpp"
-# include "vector_reverse_iterator.hpp"
+# include "../utils/reverse_iterator.hpp"
 # include "../utils/lexicographical_compare.hpp"
-
-
-/* Colors */
-#define RESET "\033[m"
-#define REED   "\033[0;31m"
-
 
 
 namespace ft
 {
-/* ref: https://github.dev/m3zh/ft_containers/tree/master/src */
 template<   class Key,
             class T,
             class compare = std::less<Key>,
@@ -32,18 +25,29 @@ class map
         typedef ft::pair<const Key, T>		                    value_type;
         typedef std::size_t                                     size_type;
         typedef std::ptrdiff_t                                  difference_type;
-        typedef compare                                         Key_compare;
+        typedef compare                                         key_compare;
         typedef alloc                                           allocator_type;
         typedef typename allocator_type::reference              reference;
         typedef typename allocator_type::const_reference        const_reference;
         typedef typename allocator_type::pointer                pointer;
         typedef typename allocator_type::const_pointer          const_pointer;
-        typedef Node<value_type>                                node;
-        typedef typename alloc::template rebind<node>::other    node_allocator;
         typedef ft::map_iterator<value_type*>                   iterator;
         typedef ft::map_iterator<const value_type*>             const_iterator;
         typedef ft::reverse_iterator<iterator>                  reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>            const_reverse_iterator;
+        
+        struct value_compare
+        {
+            key_compare key_comp;
+            value_compare() {}
+            bool operator()(const value_type &v1, const value_type &v2)
+            {
+                return (key_comp(v1.first, v2.first));
+            }
+        };
+    private:
+        typedef Node<value_type>                                node;
+        typedef typename alloc::template rebind<node>::other    node_allocator;
 
     private:
         node*                   root;
@@ -51,7 +55,7 @@ class map
         size_type               Size;
         allocator_type          allocator;
         node_allocator          nodeAlloc;
-        Key_compare             key_compare;
+        key_compare             Key_compare;
     
     private:
         node *newNode(value_type const &value, node *parent)
@@ -273,9 +277,9 @@ class map
             node *tmp = root;
             while (tmp != NIL)
             {
-                if (key_compare(value.first, tmp->value.first))
+                if (Key_compare(value.first, tmp->value.first))
                     tmp = tmp->left;
-                else if (key_compare(tmp->value.first, value.first))
+                else if (Key_compare(tmp->value.first, value.first))
                     tmp = tmp->right;
                 else
                     return (tmp);
@@ -344,11 +348,6 @@ class map
         }
 
     public:
-
-        node *get_root()
-        {
-            return (root);
-        }
         ////////////////////////////////////////////////////////////////////
         //                        Member functions                        //
         ////////////////////////////////////////////////////////////////////
@@ -361,7 +360,7 @@ class map
                                                                                             NIL(newNIL()),
                                                                                             Size(0),
                                                                                             allocator(allocator),
-                                                                                            key_compare(comp)
+                                                                                            Key_compare(comp)
         {
         }
         
@@ -372,7 +371,7 @@ class map
                                                                     NIL(newNIL()),
                                                                     Size(0),
                                                                     allocator(allocator),
-                                                                    key_compare(comp)
+                                                                    Key_compare(comp)
         {
             insert(first, last);
         }
@@ -381,7 +380,7 @@ class map
                                 NIL(newNIL()),
                                 Size(0),
                                 allocator(other.allocator),
-                                key_compare(other.key_compare)
+                                Key_compare(other.Key_compare)
         {
             const_iterator it = other.begin();
             for(; it != other.end();it++)
@@ -494,6 +493,11 @@ class map
                 return true;
             return false;
         }
+
+        size_type max_size() const
+        {
+            return (allocator.max_size());
+        }
         ////////////////////////////////////////////////////////////////////
         //                            Modifiers                           //
         ////////////////////////////////////////////////////////////////////
@@ -520,15 +524,15 @@ class map
                 while (tmp != NIL)
                 {
                     parent = tmp;
-                    if (key_compare(value.first, tmp->value.first))
+                    if (Key_compare(value.first, tmp->value.first))
                         tmp = tmp->left;
-                    else if (key_compare(tmp->value.first, value.first))
+                    else if (Key_compare(tmp->value.first, value.first))
                         tmp = tmp->right;
                     else
                         return (ft::make_pair(iterator(tmp, NIL, get_max(root)), false));
                 }
                 tmp = newNode(value, parent);
-                if (key_compare(value.first, parent->value.first))
+                if (Key_compare(value.first, parent->value.first))
                 {   
                     parent->left = tmp;
                     if (parent->color == RED)
@@ -585,6 +589,13 @@ class map
             erase(it);
             return (1);
         }
+
+        void swap(map &m1)
+        {
+            map tmp(*this);
+            *this = m1;
+            m1 = tmp;
+        }
         ////////////////////////////////////////////////////////////////////
         //                            Look Up                             //
         ////////////////////////////////////////////////////////////////////
@@ -605,9 +616,9 @@ class map
 
             while (tmp && tmp != NIL)
             {
-                if (key_compare(key, tmp->value.first))
+                if (Key_compare(key, tmp->value.first))
                     tmp = tmp->left;
-                else if (key_compare(tmp->value.first, key))
+                else if (Key_compare(tmp->value.first, key))
                     tmp = tmp->right;
                 else
                     return (iterator(tmp, NIL, get_max(root)));
@@ -621,9 +632,9 @@ class map
 
             while (tmp && tmp != NIL)
             {
-                if (key_compare(key, tmp->value.first))
+                if (Key_compare(key, tmp->value.first))
                     tmp = tmp->left;
-                else if (key_compare(tmp->value.first, key))
+                else if (Key_compare(tmp->value.first, key))
                     tmp = tmp->right;
                 else
                     return (const_iterator(tmp, NIL, get_max(root)));
@@ -631,6 +642,80 @@ class map
             return (const_iterator(NIL, NIL, get_max(root)));
         }
 
+        iterator upper_bound(const Key &key)
+        {
+            iterator it = begin();
+            while (it != end())
+            {
+                if (it->first > key)
+                    return (it);
+                else
+                    it++;
+            }
+            return (it);
+        }
+
+        const_iterator upper_bound(const Key &key) const
+        {
+            const_iterator it = begin();
+            while (it != end())
+            {
+                if (it->first > key)
+                    return (it);
+                else
+                    it++;
+            }
+            return (it);
+        }
+
+        iterator lower_bound(const Key &key)
+        {
+            iterator it = begin();
+            while (it != end())
+            {
+                if (it->first >= key)
+                    return (it);
+                else
+                    it++;
+            }
+            return (it);
+        }
+
+        const_iterator lower_bound(const Key &key) const
+        {
+            const_iterator it = begin();
+            while (it != end())
+            {
+                if (it->first >= key)
+                    return (it);
+                else
+                    it++;
+            }
+            return (it);
+        }
+
+        ft::pair<iterator, iterator> equal_range(const Key &key)
+        {
+            return (ft::make_pair(lower_bound(key), upper_bound(key)));
+        }
+
+        ft::pair<const_iterator, const_iterator> equal_range(const Key &key) const
+        {
+            return (ft::make_pair(lower_bound(key), upper_bound(key)));
+        }
+
+        ////////////////////////////////////////////////////////////////////
+        //                            Observers                           //
+        ////////////////////////////////////////////////////////////////////
+        key_compare key_comp() const
+        {
+            return (Key_compare);
+        }
+
+        value_compare value_comp() const
+        {
+            return (value_compare());
+        }
 
 };
         ////////////////////////////////////////////////////////////////////
@@ -701,6 +786,19 @@ class map
     bool    operator>=(const map<Key, T, compare, alloc> &m1, const map<Key, T, compare, alloc> &m2)
     {
         return (!(m1 < m2));
+    }
+    
+    template<   class Key,
+            class T,
+            class compare,
+            class alloc
+            >
+    void swap(map<Key, T, compare, alloc> &m1, map<Key, T, compare, alloc> &m2)
+    {
+        map<Key, T, compare, alloc> tmp(m1);
+
+        m1 = m2;
+        m2 = tmp;
     }     
 }
 

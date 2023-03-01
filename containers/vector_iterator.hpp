@@ -1,7 +1,7 @@
 #ifndef _VECTOR_ITERATOR_
 # define _VECTOR_ITERATOR_
 
-# include "vector_iterator_traits.hpp"
+# include "../utils/iterator_traits.hpp"
 namespace ft
 {
     template <class T>
