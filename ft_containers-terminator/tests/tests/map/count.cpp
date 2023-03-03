@@ -19,8 +19,6 @@ void map_test_count()
     {
         intmap m(intstr_arr, intstr_arr + intstr_size);
 
-    
-        
         intmap::size_type c = m.count(64);
 
         PRINT_LINE("Count:", c);
@@ -52,7 +50,7 @@ void map_test_count()
 
         PRINT_LINE("Count:", c);
 
-        m.erase(9); 
+        m.erase(9);
 
         c = m.count(9);
 

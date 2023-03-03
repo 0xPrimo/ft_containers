@@ -18,5 +18,10 @@ namespace ft
     template<> struct is_integral<unsigned int> { static const bool value = true; };
     template<> struct is_integral<unsigned long int> { static const bool value = true; };
     template<> struct is_integral<unsigned long long int> { static const bool value = true; };
+
+
+
+    template<class T> struct is_input { static const bool value = false; };
+    template<> struct is_input<std::input_iterator_tag> {static const bool value = true;};
 }
 #endif

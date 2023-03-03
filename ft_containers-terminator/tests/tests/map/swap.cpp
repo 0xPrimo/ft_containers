@@ -17,12 +17,10 @@ void map_test_swap()
     SETUP_ARRAYS();
 
     {
-        // dup2(2, 1);
         intmap m1(intstr_arr, intstr_arr + 32);
         intmap m2;
 
         NAMESPACE::swap(m1, m2);
-
 
         PRINT_ALL(m1);
         PRINT_ALL(m2);

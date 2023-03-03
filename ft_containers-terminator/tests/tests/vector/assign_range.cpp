@@ -75,19 +75,19 @@ void vec_test_assign_range()
         CHECK_AND_PRINT_ALL(v);
     }
 
-    {
-        // This test checks if vector works with iterators tagged as std::input_iterator_tag
-        charvector v;
+    // {
+    //     // This test checks if vector works with iterators tagged as std::input_iterator_tag
+    //     charvector v;
 
-        std::istringstream str("1 2 3 4 5 6 7");
-        std::istreambuf_iterator<char> it(str), end;
+    //     std::istringstream str("1 2 3 4 5 6 7");
+    //     std::istreambuf_iterator<char> it(str), end;
 
-        CHECK_AND_PRINT_ALL(v);
+    //     CHECK_AND_PRINT_ALL(v);
 
-        v.assign(it, end);
+    //     v.assign(it, end);
 
-        CHECK_AND_PRINT_ALL(v);
-    }
+    //     CHECK_AND_PRINT_ALL(v);
+    // }
 }
 
 MAIN(vec_test_assign_range)

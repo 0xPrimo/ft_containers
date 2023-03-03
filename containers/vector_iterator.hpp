@@ -16,6 +16,10 @@ namespace ft
             typedef typename ft::iterator_traits<T>::iterator_category           iterator_category;
 
         public:
+            T base() const
+            {
+                return (m_Ptr);
+            }
             
             Iterator(pointer Ptr = nullptr)
             {
@@ -25,10 +29,6 @@ namespace ft
             template <class type>
             Iterator(const Iterator<type> &other): m_Ptr(other.base()) {}
 
-            T base() const
-            {
-                return (m_Ptr);
-            }
 
             Iterator& operator=(const Iterator& other)
             {

@@ -48,6 +48,10 @@ class stack
                 return (c.back());
             }
 
+            const_reference top() const
+            {
+                return (c.back());
+            }
             bool empty()
             {
                 return (c.empty());

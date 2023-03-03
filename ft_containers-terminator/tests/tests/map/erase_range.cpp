@@ -20,8 +20,8 @@ void map_test_erase_range()
         strmap m;
 
         m.erase(m.begin(), m.end());
- 
-        PRINT_ALL(m); 
+
+        PRINT_ALL(m);
 
         m.insert(strstr_arr, strstr_arr + strstr_size);
 

@@ -6,17 +6,17 @@
 # define RED 0
 # define BLACK 1
 template< class T>
-struct Node
+struct Node_set
 {
     typedef T   value_type;
 
     T       value;
     int     color;
-    Node*   parent;
-    Node*   left;
-    Node*   right;
+    Node_set*   parent;
+    Node_set*   left;
+    Node_set*   right;
 
-    Node(): color(RED), left(0), right(0), parent(0) {}
+    Node_set(): color(RED), left(0), right(0), parent(0) {}
 
 };
 namespace ft
@@ -32,7 +32,7 @@ namespace ft
             typedef std::bidirectional_iterator_tag                                  iterator_category;
         
         private:
-            typedef Node<value_type>                                                 Node;
+            typedef Node_set<value_type>                                                 Node;
 
         private:
             Node *get_max(Node *node)

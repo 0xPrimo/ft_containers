@@ -10,8 +10,8 @@ ECHO_FLAG="-e"
 LOGS="logs"
 DIFFS="diffs"
 
-CXX="clang++"
-CXXFLAGS="-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g -I$FT_CONTAINERS -I."
+CXX="g++"
+CXXFLAGS="-Wall -Werror -Wextra -fsanitize=address -g -std=c++98 -I$FT_CONTAINERS -I."
 
 TEST_DIR="tests"
 

@@ -4,8 +4,8 @@
 # include <string>
 # include <iostream>
 # include <unistd.h>
-# include "../utils/pair.hpp"
 # include "map_iterator.hpp"
+# include "../utils/pair.hpp"
 # include "../utils/reverse_iterator.hpp"
 # include "../utils/lexicographical_compare.hpp"
 
@@ -46,7 +46,7 @@ class map
             }
         };
     private:
-        typedef Node<value_type>                                node;
+        typedef Node_map<value_type>                                node;
         typedef typename alloc::template rebind<node>::other    node_allocator;
 
     private:
@@ -644,54 +644,70 @@ class map
 
         iterator upper_bound(const Key &key)
         {
-            iterator it = begin();
-            while (it != end())
+            node *tmp = root;
+            node *greater = NIL;
+            while (tmp && tmp != NIL)
             {
-                if (it->first > key)
-                    return (it);
+                if (tmp->value.first > key)
+                {
+                    greater = tmp;
+                    tmp = tmp->left;
+                }
                 else
-                    it++;
+                    tmp = tmp->right;
             }
-            return (it);
+            return (iterator(greater, NIL, get_max(root)));
         }
 
         const_iterator upper_bound(const Key &key) const
         {
-            const_iterator it = begin();
-            while (it != end())
+            node *tmp = root;
+            node *greater = NIL;
+            while (tmp && tmp != NIL)
             {
-                if (it->first > key)
-                    return (it);
+                if (key < tmp->value.first)
+                {
+                    greater = tmp;
+                    tmp = tmp->left;
+                }
                 else
-                    it++;
+                    tmp = tmp->right;
             }
-            return (it);
+            return (const_iterator(greater, NIL, get_max(root)));
         }
 
         iterator lower_bound(const Key &key)
         {
-            iterator it = begin();
-            while (it != end())
+            node *tmp = root;
+            node *greater = NIL;
+            while (tmp && tmp != NIL)
             {
-                if (it->first >= key)
-                    return (it);
+                if (tmp->value.first >= key)
+                {
+                    greater = tmp;
+                    tmp = tmp->left;
+                }
                 else
-                    it++;
+                    tmp = tmp->right;
             }
-            return (it);
+            return (iterator(greater, NIL, get_max(root)));
         }
 
         const_iterator lower_bound(const Key &key) const
         {
-            const_iterator it = begin();
-            while (it != end())
+            node *tmp = root;
+            node *greater = NIL;
+            while (tmp && tmp != NIL)
             {
-                if (it->first >= key)
-                    return (it);
+                if (tmp->value.first >= key)
+                {
+                    greater = tmp;
+                    tmp = tmp->left;
+                }
                 else
-                    it++;
+                    tmp = tmp->right;
             }
-            return (it);
+            return (const_iterator(greater, NIL, get_max(root)));
         }
 
         ft::pair<iterator, iterator> equal_range(const Key &key)

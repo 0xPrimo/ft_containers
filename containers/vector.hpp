@@ -1,6 +1,9 @@
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
+#include <iostream>
+#include <unistd.h>
+
 # include <memory>
 # include <cstring>
 # include <cmath>
@@ -53,7 +56,7 @@ class vector
         difference_type m_Distance(it first, it last)
         {
             difference_type i = 0;
-
+        
             for(; first != last; first++)
                 i++;
             return i;
@@ -96,19 +99,29 @@ class vector
             m_Data(NULL),
             m_Allocator(alloc)
         {
-
-            size_type distance = &*last - &*first;
-            size_type i = 0;
-
-            reserve(distance);
-
-            while (first != last)
+            
+            if (is_input<typename iterator_traits<InputIterator>::iterator_category>::value)
             {
-                m_Allocator.construct(m_Data + i, *first);
-                first++;
-                i++;
+                vector tmp;
+                while (first != last)
+                    tmp.push_back(*first++);
+                this->swap(tmp);
             }
-            m_Size = distance;
+            else
+            {          
+                size_type distance = std::distance(first, last);
+                size_type i = 0;
+
+                reserve(distance);
+
+                while (first != last)
+                {
+                    m_Allocator.construct(m_Data + i, *first);
+                    first++;
+                    i++;
+                }
+                m_Size = distance;
+            }
         }
 
         /* Copy Constructor */
@@ -116,7 +129,8 @@ class vector
                                         m_Capacity(other.m_Capacity),
                                         m_Allocator(other.m_Allocator)
         {
-            m_Data = m_Allocator.allocate(other.m_Capacity);
+            if (other.m_Capacity)
+                m_Data = m_Allocator.allocate(other.m_Capacity);
             for(size_type i = 0; i < other.m_Size; i++)
                 m_Allocator.construct(m_Data + i, other.m_Data[i]);
         }
@@ -148,7 +162,6 @@ class vector
             if (count > m_Allocator.max_size())
                 throw std::length_error("vector");
 
-
             destroy(m_Data, m_Size);
             if (count > m_Capacity)
             {
@@ -165,18 +178,26 @@ class vector
         void assign( InputIt first, InputIt last,
                 typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
-            InputIt _first(first), _last(last);
-            size_type size = m_Distance(_first, _last);
 
-            clear();
-            if (size > m_Capacity)
-                reserve(size);
-            for(size_type i = 0; first != last; first++)
+            if (is_input<typename iterator_traits<InputIt>::iterator_category>::value)
             {
-                m_Allocator.construct(m_Data + i, *first);
-                i++;
+                vector tmp;
+                while (first != last)
+                    tmp.push_back(*first++);
+                this->swap(tmp);
             }
-            m_Size = size;
+            else
+            {
+                size_type size = m_Distance(first, last);
+
+                clear();
+                if (size > m_Capacity)
+                    reserve(size);
+                for(size_type i = 0; first != last; first++, i++)
+                    m_Allocator.construct(m_Data + i, *first);
+
+                m_Size = size;
+            }
         }
 
 
@@ -206,15 +227,11 @@ class vector
     
         reference operator[](size_type pos)
         {
-            if (pos >= m_Size)
-                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
 
         const_reference operator[](size_type pos) const
         {
-            if (pos >= m_Size)
-                throw std::out_of_range("vector");
             return (*(m_Data + pos));
         }
 
@@ -235,7 +252,7 @@ class vector
             return (*(m_Data + (m_Size - 1)));
         }
 
-        reference back() const
+        const_reference back() const
         {
             return (*(m_Data + (m_Size - 1)));
         }
@@ -386,7 +403,12 @@ class vector
                 return(iterator(m_Data + index));
 
             if (m_Size + count > m_Capacity)
-                reserve(m_Capacity + count);
+            {
+                if (m_Capacity + count > m_Capacity * 2)
+                    reserve(m_Capacity + count);
+                else
+                    reserve(m_Capacity * 2);
+            }
 
             iterator        new_pos(m_Data + index);
             if (new_pos != end())
@@ -412,41 +434,85 @@ class vector
         iterator insert(const_iterator pos, InputIt first, InputIt last,
             typename ft::enable_if<!is_integral<InputIt>::value, InputIt>::type* = 0)
         {
-        
-            size_type index = &(*pos) - m_Data;
-            size_type count = m_Distance(first, last);
-
-            /* check if there is empty place */
-            if (count == 0)
-                return(iterator(m_Data + index));
-
-            if (m_Size + count > m_Capacity)
-                reserve(m_Capacity + count);
-            
-            // shift the array by the count
-            iterator new_pos(m_Data + index);
-            if (new_pos != end())
+            if (is_input<typename iterator_traits<InputIt>::iterator_category>::value)
             {
-                for(iterator first(m_Data + (m_Size - 1)), second(m_Data + m_Size);
-                    second != new_pos; --first, --second)
+                vector tmp;
+
+                while (first != last)
+                    tmp.push_back(*first++);
+
+                iterator _first = tmp.begin();
+                size_type index = &(*pos) - m_Data;
+                size_type count = std::distance(tmp.begin(), tmp.end());
+
+
+                /* check if there is empty place */
+                if (count == 0)
+                    return(iterator(m_Data + index));
+
+                if (m_Size + count > m_Capacity)
+                    reserve(m_Capacity + count);
+
+                // shift the array by the count
+                iterator new_pos(m_Data + index);
+                if (new_pos != end())
                 {
-
-                    m_Allocator.construct(&(*(first + count)), *first);
-                    m_Allocator.destroy(&(*first));
-                
+                    for(iterator first(m_Data + (m_Size - 1)), second(m_Data + m_Size);
+                        second != new_pos; --_first, --second)
+                    {
+                        m_Allocator.construct(&(*(_first + count)), *_first);
+                        m_Allocator.destroy(&(*_first));
+                    }
                 }
-            }
 
-            for(size_type i = index; first != last; first++)
+                m_Size += count;
+
+                for(size_type i = index; _first != tmp.end(); _first++)
+                {
+                    m_Allocator.construct(m_Data + i, *_first);
+                    i++;
+                }
+
+                return (iterator(m_Data + index));
+            }
+            else
             {
-                m_Allocator.construct(m_Data + i, *first);
-                i++;
+                size_type index = &(*pos) - m_Data;
+                size_type count = std::distance(first, last);
+
+
+                /* check if there is empty place */
+                if (count == 0)
+                    return(iterator(m_Data + index));
+                
+                if (m_Size + count > m_Capacity)
+                {
+                    if (m_Capacity + count > m_Capacity * 2)
+                        reserve(m_Capacity + count);
+                    else
+                        reserve(m_Capacity * 2);
+                }
+                // shift the array by the count
+                iterator new_pos(m_Data + index);
+                if (new_pos != end())
+                {
+                    for(iterator first(m_Data + (m_Size - 1)), second(m_Data + m_Size);
+                        second != new_pos; --first, --second)
+                    {
+                        m_Allocator.construct(&(*(first + count)), *first);
+                        m_Allocator.destroy(&(*first));
+                    }
+                }
+
+                m_Size += count;
+
+                for(size_type i = index; first != last; first++)
+                {
+                    m_Allocator.construct(m_Data + i, *first);
+                    i++;
+                }
+                return (iterator(m_Data + index));
             }
-
-            m_Size += count;
-            return (iterator(m_Data + index));
-
-        
         }
         /* push back */
         void push_back(const T& value)
